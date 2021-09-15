@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Core.Common.SharedDataObjects;
 using GeoJSON.Net.Feature;
 using GeoJSON.Net.Geometry;
 using Newtonsoft.Json;
@@ -10,7 +12,7 @@ namespace Core.Common.GpxUtils
 {
     public static class GpxConverter
     {
-        public static byte[] ConvertGpxToGeoJson(Stream gpxFileStream)
+        public static void ConvertGpxToGeoJson(Stream gpxFileStream, Route routeToFill)
         {
             using (StreamReader sr = new StreamReader(gpxFileStream))
             {
@@ -19,7 +21,8 @@ namespace Core.Common.GpxUtils
                 gpxReader.Read();
                 var track = gpxReader.Track;
                 var trackPoints = gpxReader.Track.ToGpxPoints();
-                
+
+                routeToFill.RouteLength = (float) track.GetLength();
                 
                 //var route = gpxReader.ObjectType;
                 // var routePoints = route.ToGpxPoints();
@@ -28,7 +31,7 @@ namespace Core.Common.GpxUtils
                     new Position(gpxPoint.Latitude, gpxPoint.Longitude, gpxPoint.Elevation)).ToList();
                 
                 var yobtaStr = WriteGeoJson(positions);
-                return Encoding.ASCII.GetBytes(yobtaStr);
+                routeToFill.GeoJsonFileContent = Encoding.ASCII.GetBytes(yobtaStr);
             }
         }
         

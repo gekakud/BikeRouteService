@@ -13,7 +13,7 @@ namespace Core.Common.SharedDataObjects
 
         public int RouteDifficulty { get; set; }
 
-        //.gpx, .json, .etc.
+        //.gpx, .geojson, .etc.
         public string OrigFileExtension { get; set; }
 
         public byte[] OrigFileContent { get; set; }
@@ -28,4 +28,5 @@ namespace Core.Common.SharedDataObjects
 
         public double EndLng { get; set; }
     }
+    public enum FileExtension{ NotSupported, Gpx, GeoJson, Kml}
 }

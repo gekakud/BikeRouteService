@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Common.SharedDataObjects;
 
 namespace Core.Common.Extensions
 {
@@ -29,6 +30,28 @@ namespace Core.Common.Extensions
                 formFile.CopyToAsync(memoryStream);
                 return memoryStream.ToArray();
             }
+        }
+        
+        public static FileExtension GetFileExtension(this IFormFile file)
+        {
+            var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
+
+            if (extension is ".gpx" or ".GPX")
+            {
+                return FileExtension.Gpx;
+            }
+
+            if (extension is ".geojson")
+            {
+                return FileExtension.GeoJson;
+            }
+            
+            if (extension is ".KML" or ".kml")
+            {
+                return FileExtension.Kml;
+            }
+            
+            return FileExtension.NotSupported;
         }
     }
 }
