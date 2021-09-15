@@ -26,7 +26,6 @@ namespace MongoClientTest
             {
                 Console.WriteLine(dec);
             }
-            var t = 4;
         }
     }
 }

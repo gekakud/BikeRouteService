@@ -7,17 +7,17 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
+using Core.Common.GpxUtils;
 
 namespace BikeRouteService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TestGpsController : ControllerBase
+    public class RoutesController : ControllerBase
     {
-        private readonly ILogger<TestGpsController> _logger;
+        private readonly ILogger<RoutesController> _logger;
         private readonly IDataRepository<Route> routesRepository;
-        public TestGpsController(ILogger<TestGpsController> logger, IDataRepository<Route> _routesDataRepo)
+        public RoutesController(ILogger<RoutesController> logger, IDataRepository<Route> _routesDataRepo)
         {
             _logger = logger;
             routesRepository = _routesDataRepo;
@@ -36,8 +36,8 @@ namespace BikeRouteService.Controllers
                     lattitude = rng.Next(-20, 55),
                     longitude = rng.Next(-20, 55)
                 };
-                var y = new JsonResult(t);
-                return y;
+                
+                return new JsonResult(t);
             }
             catch (Exception exception)
             {
@@ -68,8 +68,9 @@ namespace BikeRouteService.Controllers
         {
             try
             {
-                //check if route already exist
-                await AddNewRoute(ConvertFileToGeoJson(routeFile, routeName));
+                //TODO: check if route already exist
+                Route geoJsonRouteObject = BuildGeoJsonRouteObject(routeFile, routeName);
+                await AddNewRoute(geoJsonRouteObject);
                 return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception exception)
@@ -88,7 +89,7 @@ namespace BikeRouteService.Controllers
                 //check if route already exist
                 List<Route> routeFile = await routesRepository.FindAsync(r => r.RouteName == routeName) as List<Route>;
 
-                if (routeFile.Count == 0)
+                if ()
                 {
                     return StatusCode(StatusCodes.Status404NotFound);
                 }
@@ -117,17 +118,18 @@ namespace BikeRouteService.Controllers
             };
         }
 
-        private Route ConvertFileToGeoJson(IFormFile routeFile, string routeName)
+        private Route BuildGeoJsonRouteObject(IFormFile routeFile, string routeName)
         {
             Route route = new Route();
             route.RouteName = routeName;
 
-            if (!CheckIfGpxFile(routeFile))
+            if (CheckIfGpxFile(routeFile))
             {
+                //TODO: add routeobject builder as intermidiate
                 route.OrigFileExtension = "gpx";
+                route.GeoJsonFileContent = GpxConverter.ConvertGpxToGeoJson(routeFile.OpenReadStream());
+                route.OrigFileContent = routeFile.GetBytes();
             }
-
-            route.OrigFileContent = routeFile.GetBytes();
             
             return route;
         }
