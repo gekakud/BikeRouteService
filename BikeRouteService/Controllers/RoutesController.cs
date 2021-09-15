@@ -89,7 +89,7 @@ namespace BikeRouteService.Controllers
                 //check if route already exist
                 List<Route> routeFile = await routesRepository.FindAsync(r => r.RouteName == routeName) as List<Route>;
 
-                if ()
+                if (routeFile==null || routeFile.Count == 0)
                 {
                     return StatusCode(StatusCodes.Status404NotFound);
                 }
