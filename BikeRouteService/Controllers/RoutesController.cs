@@ -1,13 +1,12 @@
-﻿using Core.Common.Extensions;
-using Core.Common.Interfaces;
-using Core.Common.SharedDataObjects;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Core.Common.Extensions;
+using Core.Common.Interfaces;
+using Core.Common.SharedDataObjects;
 using Core.Common.GpxUtils;
 
 namespace BikeRouteService.Controllers
@@ -44,13 +43,17 @@ namespace BikeRouteService.Controllers
 
         [HttpPost]
         [Route("UploadRouteFile")]
-        public async Task<IActionResult> UploadRouteFile(IFormFile routeFile, string routeName)
+        public async Task<IActionResult> UploadRouteFile(IFormFile routeObject, string routeName, RouteDifficulty difficulty)
         {
             try
             {
-                //TODO: check if route already exist before doing anything
-                Route geoJsonRouteObject = BuildGeoJsonRouteObject(routeFile, routeName);
-                await AddNewRoute(geoJsonRouteObject);
+                if (!routesRepository.ExistsAsync(r => r.RouteName == routeName).Result)
+                {
+                    return StatusCode(StatusCodes.Status405MethodNotAllowed, $"Route with name {routeName} already exist");
+                }
+                
+                Route geoJsonRouteObject = BuildGeoJsonRouteObject(routeObject, routeName, difficulty);
+                await routesRepository.AddAsync(geoJsonRouteObject);
                 return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception exception)
@@ -71,21 +74,19 @@ namespace BikeRouteService.Controllers
                     return StatusCode(StatusCodes.Status404NotFound, "Must provide file extension");
                 }
                 
-                //TODO: check if route already exist
-                var res = await routesRepository.FindAsync(r => r.RouteName == routeName);
-                Route routeFile = res.FirstOrDefault();
+                Route routeObject = await routesRepository.GetAsync(r => r.RouteName == routeName);
 
-                if (routeFile == null)
+                if (routeObject == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, $"Route with name {routeName} not found");
                 }
 
                 if (fileExtension == FileExtension.GeoJson)
                 {
-                    return GetRouteAsGeoJsonFile(routeFile);
+                    return GetRouteAsGeoJsonFile(routeObject);
                 }
                 
-                return GetRouteAsOriginalFile(routeFile);
+                return GetRouteAsOriginalFile(routeObject);
             }
             catch (Exception exception)
             {
@@ -100,15 +101,14 @@ namespace BikeRouteService.Controllers
         {
             try
             {
-                //TODO: check if route already exist
-                List<Route> routeFile = await routesRepository.FindAsync(r => r.RouteName == routeName) as List<Route>;
+                Route routeObject = await routesRepository.GetAsync(r => r.RouteName == routeName);
 
-                if (routeFile==null || routeFile.Count == 0)
+                if (routeObject==null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, $"Route with name {routeName} not found");
                 }
 
-                return GetRouteAsOriginalFile(routeFile.FirstOrDefault());
+                return GetRouteAsOriginalFile(routeObject);
             }
             catch (Exception exception)
             {
@@ -133,21 +133,22 @@ namespace BikeRouteService.Controllers
             };
         }
 
-        private Route BuildGeoJsonRouteObject(IFormFile routeFile, string routeName)
+        private Route BuildGeoJsonRouteObject(IFormFile routeObject, string routeName, RouteDifficulty difficulty)
         {
             //TODO: add routeobject builder as intermidiate
             Route route = new Route
             {
-                RouteName = routeName
+                RouteName = routeName,
+                RouteDifficulty = difficulty
             };
 
-            switch (routeFile.GetFileExtension())
+            switch (routeObject.GetFileExtension())
             {
                 case FileExtension.Gpx:
                     
                     route.OrigFileExtension = "gpx";
-                    route.OrigFileContent = routeFile.GetBytes();
-                    GpxConverter.ConvertGpxToGeoJson(routeFile.OpenReadStream(), route);
+                    route.OrigFileContent = routeObject.GetBytes();
+                    GpxConverter.ConvertGpxToGeoJson(routeObject.OpenReadStream(), route);
                     break;
                 
                 case FileExtension.GeoJson:
@@ -163,19 +164,6 @@ namespace BikeRouteService.Controllers
             }
             
             return route;
-        }
-
-        private async Task AddNewRoute(Route route)
-        {
-            try
-            {
-                await routesRepository.AddAsync(route);
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception.Message);
-                throw;
-            }
         }
     }
 }
