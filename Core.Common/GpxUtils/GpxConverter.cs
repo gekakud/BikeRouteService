@@ -20,7 +20,7 @@ namespace Core.Common.GpxUtils
                 gpxReader.Read();
                 var track = gpxReader.Track;
                 var trackPoints = gpxReader.Track.ToGpxPoints();
-
+                
                 //var route = gpxReader.ObjectType;
                 // var routePoints = route.ToGpxPoints();
 

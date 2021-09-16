@@ -3,6 +3,7 @@ using Core.Common.Mongo;
 using Core.Common.SharedDataObjects;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +25,11 @@ namespace BikeRouteService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddNewtonsoftJson();
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = 
+                    $"{Configuration.GetValue<string>("redis:Server")}:{Configuration.GetValue<int>("redis:Port")}";
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BikeRouteService", Version = "v1" });
@@ -39,7 +45,6 @@ namespace BikeRouteService
             // call builder.Populate(), that happens in AutofacServiceProviderFactory
             // for you.
             builder.AddMongo();
-            //builder.AddMongoRepository<User>("Users");
             builder.AddMongoRepository<Route>("routes_collection");
         }
         // Inside of Configure method we set up middleware that handles
