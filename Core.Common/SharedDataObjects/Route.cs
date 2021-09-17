@@ -9,7 +9,11 @@ namespace Core.Common.SharedDataObjects
 
         public string RouteName { get; set; }
 
+        public string RouteDescription { get; set; }
+        
         public double RouteLength { get; set; }
+
+        public RouteType RouteType { get; set; }
 
         public RouteDifficulty RouteDifficulty { get; set; }
 
@@ -32,7 +36,28 @@ namespace Core.Common.SharedDataObjects
         
         public double MaxAltitude { get; set; }
     }
-    public enum FileExtension{ NotSupported, Gpx, GeoJson, Kml}
-    
-    public enum RouteDifficulty{ Beginner, Intermediate , Proficient , Beast}
+
+    public enum FileExtension
+    {
+        NotSupported,
+        Gpx,
+        GeoJson,
+        Kml
+    }
+
+    public enum RouteType
+    {
+        Mtb,
+        Gravel,
+        Road,
+        Mixed
+    }
+
+    public enum RouteDifficulty
+    {
+        Beginner,
+        Intermediate,
+        Proficient,
+        Beast
+    }
 }

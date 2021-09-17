@@ -43,7 +43,7 @@ namespace BikeRouteService.Controllers
 
         [HttpPost]
         [Route("UploadRouteFile")]
-        public async Task<IActionResult> UploadRouteFile(IFormFile routeObject, string routeName, RouteDifficulty difficulty)
+        public async Task<IActionResult> UploadRouteFile(IFormFile routeFile, string routeName, RouteDifficulty difficulty)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace BikeRouteService.Controllers
                     return StatusCode(StatusCodes.Status405MethodNotAllowed, $"Route with name {routeName} already exist");
                 }
                 
-                Route geoJsonRouteObject = BuildGeoJsonRouteObject(routeObject, routeName, difficulty);
+                Route geoJsonRouteObject = BuildGeoJsonRouteObject(routeFile, routeName, difficulty);
                 await routesRepository.AddAsync(geoJsonRouteObject);
                 return StatusCode(StatusCodes.Status200OK);
             }
