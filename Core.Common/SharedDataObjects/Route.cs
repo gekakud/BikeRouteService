@@ -1,12 +1,13 @@
 ﻿using Core.Common.Interfaces;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Common.SharedDataObjects
 {
     public class Route: IIdentifiable
     {
         public Guid Id { get; set; }
-
+        
         public string RouteName { get; set; }
 
         public string RouteDescription { get; set; }

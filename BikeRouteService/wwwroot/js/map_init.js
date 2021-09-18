@@ -2,17 +2,42 @@
 
     var markers = new Array(0);
     var dataPoints = new Array(0);
-    var route = new Array(0);
 
     mapboxgl.accessToken = 'pk.eyJ1IjoiZ2VrYXBlayIsImEiOiJja3J3MDc5aDUwYnVtMnZuODI3bnN4bWo4In0.Y7ifVj3T99VpyiLNuLEVnQ';
     const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v11',
-        center: [12.550343, 55.665957],
-        zoom: 4
+        center: [35.374668, 32.796048],
+        zoom: 6
     });
 
+    function loadMarkersData(){
+        //fetch
+        for (var i = 0; i < markers.length; i++){
+            markers[i].addTo(map);
+        }
+    }
+
     map.on('load', () => {
+        $.get("http://localhost:6002/api/Routes/GetAllRoutesInfo",{time:"2018-11-24T15:46:18.152Z"})
+        .done(function (jsonResponse) {
+          for (var i = 0; i < jsonResponse.length; i++) 
+          {
+              markers[i]=new mapboxgl.Marker({ color: 'green' })
+                                    .setLngLat([jsonResponse[i].StartLng, jsonResponse[i].StartLat])
+                                    .setPopup(new mapboxgl.Popup({offset: 25})
+                                    .setText(jsonResponse[i].RouteName + " Route length:" + jsonResponse[i].RouteLength
+                                    + " Route type:" + jsonResponse[i].RouteType
+                                    + " Route difficulty:" + jsonResponse[i].RouteDifficulty
+                                    ));
+          }
+          loadMarkersData();
+        })
+        .fail(function (jqxhr, textStatus, error) {
+          var err = textStatus + ", " + error;
+          alert("Request Failed: " + err);
+        });
+
         map.addSource('earthquakes', {
             type: 'geojson',
             // Use a URL for the value for the `data` property.
@@ -34,20 +59,6 @@
                 }
         });
     });
-    // Create a default Marker and add it to the map.
-    /* const marker1 = new mapboxgl.Marker()
-        .setLngLat([12.554729, 55.70651])
-        .addTo(map); */
-
-    markers[0]=new mapboxgl.Marker()
-        .setLngLat([12.554729, 55.70651]);
-    // Create a default Marker, colored black, rotated 45 degrees.
-    /* const marker2 = new mapboxgl.Marker({ color: 'black', rotation: 45 })
-        .setLngLat([12.65147, 55.608166])
-        .addTo(map); */
-    markers[1]=new mapboxgl.Marker({ color: 'black', rotation: 45 })
-        .setLngLat([12.65147, 55.608166]).setPopup(new mapboxgl.Popup({offset: 25})
-            .setText('Construction on the Washington Monument began in 1848.'));
 
     function clearAll() {
         for (var i = 0; i < markers.length; i++){
@@ -58,14 +69,7 @@
         map.removeSource("earthquakes");
     }
 
-    function loadMapData(){
-        //fetch
-        for (var i = 0; i < markers.length; i++){
-            markers[i].addTo(map);
-        }
-    }
-
-    loadMapData();
+    loadMarkersData();
 
 
     $(document).ready(function() {

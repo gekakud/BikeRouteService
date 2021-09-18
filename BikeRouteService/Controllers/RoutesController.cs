@@ -30,7 +30,7 @@ namespace BikeRouteService.Controllers
             try
             {
                 // TODO: list properties names should not be hardcoded
-                var fieldsToFetch = new List<string> { "RouteLength", "RouteName", "RouteDifficulty" };
+                var fieldsToFetch = new List<string> { "RouteLength", "RouteName", "RouteDifficulty", "RouteType", "StartLat", "StartLng" };
                 IEnumerable<Route> routesInfos = await routesRepository.GetAllDocsSpecificFieldsOnlyAsync(fieldsToFetch);
                 var jsonRes = new JsonResult(routesInfos);
                 return jsonRes;
@@ -43,16 +43,16 @@ namespace BikeRouteService.Controllers
 
         [HttpPost]
         [Route("UploadRouteFile")]
-        public async Task<IActionResult> UploadRouteFile(IFormFile routeFile, string routeName, RouteDifficulty difficulty)
+        public async Task<IActionResult> UploadRouteFile(IFormFile routeFile, string routeName, RouteDifficulty difficulty, RouteType routeType)
         {
             try
             {
-                if (!routesRepository.ExistsAsync(r => r.RouteName == routeName).Result)
+                if (routesRepository.ExistsAsync(r => r.RouteName == routeName).Result)
                 {
                     return StatusCode(StatusCodes.Status405MethodNotAllowed, $"Route with name {routeName} already exist");
                 }
                 
-                Route geoJsonRouteObject = BuildGeoJsonRouteObject(routeFile, routeName, difficulty);
+                Route geoJsonRouteObject = BuildGeoJsonRouteObject(routeFile, routeName, difficulty, routeType);
                 await routesRepository.AddAsync(geoJsonRouteObject);
                 return StatusCode(StatusCodes.Status200OK);
             }
@@ -133,13 +133,14 @@ namespace BikeRouteService.Controllers
             };
         }
 
-        private Route BuildGeoJsonRouteObject(IFormFile routeObject, string routeName, RouteDifficulty difficulty)
+        private Route BuildGeoJsonRouteObject(IFormFile routeObject, string routeName, RouteDifficulty difficulty, RouteType routeType)
         {
             //TODO: add routeobject builder as intermidiate
             Route route = new Route
             {
                 RouteName = routeName,
-                RouteDifficulty = difficulty
+                RouteDifficulty = difficulty,
+                RouteType = routeType
             };
 
             switch (routeObject.GetFileExtension())

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
 
 namespace BikeRouteService
 {
@@ -23,7 +24,12 @@ namespace BikeRouteService
         // called by the runtime before the Configure method, below.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddNewtonsoftJson();
+            //disable camelCase policy - serialize properties names as it appears in a model
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                // Use the default property (Pascal) casing
+                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            });
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = 
