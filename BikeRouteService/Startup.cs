@@ -3,7 +3,6 @@ using Core.Common.Mongo;
 using Core.Common.SharedDataObjects;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -61,8 +60,10 @@ namespace BikeRouteService
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BikeRouteService v1"));
             }
 
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+            
             app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthorization();
