@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Core.Common.Extensions;
 using Core.Common.Interfaces;
@@ -32,7 +33,8 @@ namespace BikeRouteService.Controllers
                 // TODO: list properties names should not be hardcoded
                 var fieldsToFetch = new List<string> { "RouteLength", "RouteName", "RouteDifficulty", "RouteType", "StartLat", "StartLng" };
                 IEnumerable<Route> routesInfos = await routesRepository.GetAllDocsSpecificFieldsOnlyAsync(fieldsToFetch);
-                var jsonRes = new JsonResult(routesInfos);
+                string hh = GpxConverter.GetAllRoutesInfoPointsGeoJson(routesInfos.ToList());
+                var jsonRes = new JsonResult(hh);
                 return jsonRes;
             }
             catch (Exception exception)

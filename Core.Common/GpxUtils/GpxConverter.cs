@@ -42,6 +42,27 @@ namespace Core.Common.GpxUtils
                 routeToFill.GeoJsonFileContent = Encoding.ASCII.GetBytes(yobtaStr);
             }
         }
+
+        public static string GetAllRoutesInfoPointsGeoJson(List<Route> routes)
+        {
+            var geoFeatures = new List<Feature>();
+            foreach (Route route in routes)
+            {
+                var featureProperties = new Dictionary<string, object>
+                {
+                    { "RouteName", route.RouteName },
+                    { "RouteType", route.RouteType},
+                    { "RouteDifficulty", route.RouteDifficulty },
+                    { "RouteLength", route.RouteLength }
+                };
+                geoFeatures.Add(new Feature(new Point(new Position(route.StartLat, route.StartLng)),featureProperties));
+            }
+            
+            var featureCollection = new FeatureCollection(geoFeatures);
+            
+            var featureCollectionJson = JsonConvert.SerializeObject(featureCollection);
+            return featureCollectionJson;
+        }
         
         private static string WriteGeoJson(List<Position> coordinates)
         {

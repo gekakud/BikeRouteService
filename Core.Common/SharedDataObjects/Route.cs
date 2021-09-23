@@ -36,6 +36,8 @@ namespace Core.Common.SharedDataObjects
         public double MinAltitude { get; set; }
         
         public double MaxAltitude { get; set; }
+
+        public double Altitude { get; set; }
     }
 
     public enum FileExtension
