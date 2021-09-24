@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -38,8 +39,8 @@ namespace Core.Common.GpxUtils
                 routeToFill.MinAltitude = (double) positions.Select(p => p.Altitude).Min();
                 routeToFill.MaxAltitude = (double) positions.Select(p => p.Altitude).Max();
                 
-                var yobtaStr = WriteGeoJson(positions);
-                routeToFill.GeoJsonFileContent = Encoding.ASCII.GetBytes(yobtaStr);
+                var gjString = WriteGeoJson(positions);
+                routeToFill.GeoJsonFileContent = Encoding.ASCII.GetBytes(gjString);
             }
         }
 
@@ -64,12 +65,34 @@ namespace Core.Common.GpxUtils
             return featureCollectionJson;
         }
         
+        public static string GetRouteGeoJson(Route route)
+        {
+            var featureProperties = new Dictionary<string, object>
+            {
+                { "RouteName", route.RouteName },
+                { "RouteType", route.RouteType},
+                { "RouteDifficulty", route.RouteDifficulty },
+                { "RouteLength", route.RouteLength }
+            };
+
+            var featureCollectionStr = ReadGeoJsonFromBytes(route.GeoJsonFileContent);
+            
+            FeatureCollection featureCollection = JsonConvert.DeserializeObject<FeatureCollection>(featureCollectionStr);
+            
+            return featureCollectionStr;
+        }
+        
+        private static string ReadGeoJsonFromBytes(byte[] gsBytes)
+        {
+            return Encoding.ASCII.GetString(gsBytes, 0, gsBytes.Length);
+        }
+        
         private static string WriteGeoJson(List<Position> coordinates)
         {
-            var geometry = new LineString(coordinates);
+            var line = new LineString(coordinates);
             
-            var lineJson = JsonConvert.SerializeObject(new Feature(geometry));
-            var featureCollection = new FeatureCollection(new List<Feature> {new Feature(geometry)});
+            var lineJson = JsonConvert.SerializeObject(new Feature(line));
+            var featureCollection = new FeatureCollection(new List<Feature> {new Feature(line)});
 
             var featureCollectionJson = JsonConvert.SerializeObject(featureCollection);
             return featureCollectionJson;

@@ -33,8 +33,8 @@ namespace BikeRouteService.Controllers
                 // TODO: list properties names should not be hardcoded
                 var fieldsToFetch = new List<string> { "RouteLength", "RouteName", "RouteDifficulty", "RouteType", "StartLat", "StartLng" };
                 IEnumerable<Route> routesInfos = await routesRepository.GetAllDocsSpecificFieldsOnlyAsync(fieldsToFetch);
-                string hh = GpxConverter.GetAllRoutesInfoPointsGeoJson(routesInfos.ToList());
-                var jsonRes = new JsonResult(hh);
+                string routesInfosAsJson = GpxConverter.GetAllRoutesInfoPointsGeoJson(routesInfos.ToList());
+                var jsonRes = new JsonResult(routesInfosAsJson);
                 return jsonRes;
             }
             catch (Exception exception)
@@ -43,6 +43,29 @@ namespace BikeRouteService.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GetRouteGeoJsonByName")]
+        public async Task<IActionResult> GetRouteGeoJsonByName([FromQuery]string routeName)
+        {
+            try
+            {
+                Route routeObject = await routesRepository.GetAsync(r => r.RouteName == routeName);
+
+                if (routeObject == null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, $"Route with name {routeName} not found");
+                }
+
+                string ff = GpxConverter.GetRouteGeoJson(routeObject);
+                var jsonRes = new JsonResult(ff);
+                return jsonRes;
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, exception.Message);
+            }
+        }
+        
         [HttpPost]
         [Route("UploadRouteFile")]
         public async Task<IActionResult> UploadRouteFile(IFormFile routeFile, string routeName, RouteDifficulty difficulty, RouteType routeType)

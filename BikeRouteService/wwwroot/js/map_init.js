@@ -20,97 +20,101 @@
         currentZoom.textContent = map.getZoom();
     });
 
-    var allRoutesInfoGeoJson = ""
+    
     map.on('load', () => {
+        initializeMap();
+    });
+    
+    var allRoutesInfoGeoJson = ""
+    function initializeMap(){
         $.get(routesApi + "GetAllRoutesInfo")
             .done(function (jsonResponse) {
                 allRoutesInfoGeoJson = JSON.parse(jsonResponse);
 
-                for (var i = 0; i < allRoutesInfoGeoJson.features.length; i++) {
-                    var pointGeometry = allRoutesInfoGeoJson.features[i].geometry;
-                    var pointProps = allRoutesInfoGeoJson.features[i].properties;
-                    markers[i] = new mapboxgl.Marker({
-                            color: 'green'
-                        })
-                        .setLngLat([pointGeometry.coordinates[0], pointGeometry.coordinates[1]])
-                        .setPopup(new mapboxgl.Popup({
-                                offset: 25
-                            })
-                            .setText(pointProps.RouteName + " Route length:" + pointProps.RouteLength +
-                                " Route type:" + pointProps.RouteType +
-                                " Route difficulty:" + pointProps.RouteDifficulty
-                            ));
+                for (let i = 0; i < allRoutesInfoGeoJson.features.length; i++) {
+                    const pointGeometry = allRoutesInfoGeoJson.features[i].geometry;
+                    const pointProps = allRoutesInfoGeoJson.features[i].properties;
 
-                    markers[i].getElement().addEventListener('click', () => {
-                        map.flyTo({center: pointGeometry.coordinates});
+                    const popup = new mapboxgl.Popup({
+                        closeButton: false,
+                        closeOnClick: false,
+                        offset: 25
+                    }).setHTML(`<h3>${pointProps.RouteName}</h3> <p>${pointProps.RouteType}</p> <p>${pointProps.RouteLength}</p><p>${pointProps.RouteDifficulty}</p>`);
+
+                    markers[i] = new mapboxgl.Marker({color: 'green'})
+                        .setLngLat([pointGeometry.coordinates[0], pointGeometry.coordinates[1]])
+                        .setPopup(popup);
+
+                    const markerDiv = markers[i].getElement();
+
+                    markerDiv.addEventListener('mouseenter', () => markers[i].togglePopup());
+                    markerDiv.addEventListener('mouseleave', () => markers[i].togglePopup());
+
+                    markerDiv.addEventListener('click', () => {
+                        map.flyTo({center: pointGeometry.coordinates, zoom: 14});
+                        markers[i].togglePopup();
+                        $.get(routesApi + "GetRouteGeoJsonByName", {routeName:pointProps.RouteName})
+                            .done(function (jsonResponse) {
+                                var opapa = JSON.parse(jsonResponse);
+
+                                clearRouteLayer();
+
+                                map.addSource('route', {
+                                    'type': 'geojson',
+                                    'data':opapa});
+
+                                map.addLayer({
+                                    'id': 'route-layer',
+                                    'type': 'line',
+                                    'source': 'route',
+                                    'layout': {
+                                        'line-join': 'round',
+                                        'line-cap': 'round'
+                                    },
+                                    'paint': {
+                                        'line-color': '#d43811',
+                                        'line-width': 8
+                                    }
+                                });
+                            });
                     });
                 }
+
                 map.flyTo({center: allRoutesInfoGeoJson.features[0].geometry.coordinates});
-
-                // map.addSource('points', {
-                //     'type': 'geojson',
-                //     'data': allRoutesInfoGeoJson
-                // });
-
-                // // Add a circle layer
-                // map.addLayer({
-                //     'id': 'circle',
-                //     'type': 'circle',
-                //     'source': 'points',
-                //     'paint': {
-                //         'circle-color': '#4264fb',
-                //         'circle-radius': 8,
-                //         'circle-stroke-width': 2,
-                //         'circle-stroke-color': '#ffffff'
-                //     }
-                // });
-                // // Center the map on the coordinates of any clicked circle from the 'circle' layer.
-                // map.on('click', 'circle', (e) => {
-                //     map.flyTo({
-                //         center: e.features[0].geometry.coordinates
-                //     });
-                //     // map.fitBounds([
-                //     //     [32.958984, -5.353521], // southwestern corner of the bounds
-                //     //     [43.50585, 5.615985] // northeastern corner of the bounds
-                //     //     ]);
-                // });
-
-                // // Change the cursor to a pointer when the it enters a feature in the 'circle' layer.
-                // map.on('mouseenter', 'circle', () => {
-                //     map.getCanvas().style.cursor = 'pointer';
-                // });
-
-                // // Change it back to a pointer when it leaves.
-                // map.on('mouseleave', 'circle', () => {
-                //     map.getCanvas().style.cursor = '';
-                // });
                 loadMarkersData();
             })
             .fail(function (jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;
                 alert("Request Failed: " + err);
             });
-    });
-
+    }
+    
+    function clearRouteLayer(){
+        var all_layers = new Array(0);
+        for(let j=0;j<map.getStyle().layers.length;j++){
+            all_layers.push(map.getStyle().layers[j].id)
+        }
+        if(all_layers.includes("route-layer")){
+            map.removeLayer("route-layer");
+            map.removeSource("route");
+        }
+    }
+    
     function loadMarkersData() {
         //fetch
-        for (var i = 0; i < markers.length; i++) {
+        for (let i = 0; i < markers.length; i++) {
             markers[i].addTo(map);
         }
     }
 
     function clearAll() {
-        for (var i = 0; i < markers.length; i++) {
+        for (let i = 0; i < markers.length; i++) {
             markers[i].remove();
         }
 
-        map.removeLayer("earthquakes-layer");
-        map.removeSource("earthquakes");
+        clearRouteLayer();
     }
-
-    loadMarkersData();
-
-
+    
     $(document).ready(function () {
         $("#clear_all").click(function () {
             clearAll();
@@ -119,18 +123,7 @@
         $("#get_points").click(function () {
             //{ version: "5", language: "php" }
             clearAll();
-            $.get("https://datahub.io/examples/geojson-tutorial/r/0.geojson", {
-                    time: "2018-11-24T15:46:18.152Z"
-                })
-                .done(function (jsonResponse) {
-                    dataPoints = [];
-
-                    console.log(jsonResponse)
-                })
-                .fail(function (jqxhr, textStatus, error) {
-                    var err = textStatus + ", " + error;
-                    alert("Request Failed: " + err);
-                });
+            initializeMap();
         });
 
     });
