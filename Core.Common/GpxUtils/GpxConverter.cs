@@ -38,6 +38,8 @@ namespace Core.Common.GpxUtils
                 
                 routeToFill.MinAltitude = (double) positions.Select(p => p.Altitude).Min();
                 routeToFill.MaxAltitude = (double) positions.Select(p => p.Altitude).Max();
+
+                routeToFill.ElevationGain = routeToFill.MaxAltitude - routeToFill.MinAltitude;
                 
                 var gjString = WriteGeoJson(positions);
                 routeToFill.GeoJsonFileContent = Encoding.ASCII.GetBytes(gjString);
@@ -51,12 +53,14 @@ namespace Core.Common.GpxUtils
             {
                 var featureProperties = new Dictionary<string, object>
                 {
-                    { "RouteName", route.RouteName },
-                    { "RouteType", route.RouteType},
-                    { "RouteDifficulty", route.RouteDifficulty },
-                    { "RouteLength", route.RouteLength }
+                    {"RouteName", route.RouteName},
+                    {"RouteType", route.RouteType},
+                    {"RouteDifficulty", route.RouteDifficulty},
+                    {"RouteLength", route.RouteLength},
+                    {"ElevationGain", route.ElevationGain}
                 };
-                geoFeatures.Add(new Feature(new Point(new Position(route.StartLat, route.StartLng)),featureProperties));
+                geoFeatures.Add(new Feature(new Point(new Position(route.StartLat, route.StartLng)),
+                    featureProperties));
             }
             
             var featureCollection = new FeatureCollection(geoFeatures);

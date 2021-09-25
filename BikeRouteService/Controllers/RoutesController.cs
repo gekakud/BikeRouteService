@@ -31,7 +31,7 @@ namespace BikeRouteService.Controllers
             try
             {
                 // TODO: list properties names should not be hardcoded
-                var fieldsToFetch = new List<string> { "RouteLength", "RouteName", "RouteDifficulty", "RouteType", "StartLat", "StartLng" };
+                var fieldsToFetch = new List<string> { "RouteLength", "RouteName", "RouteDifficulty", "RouteType", "StartLat", "StartLng", "ElevationGain" };
                 IEnumerable<Route> routesInfos = await routesRepository.GetAllDocsSpecificFieldsOnlyAsync(fieldsToFetch);
                 string routesInfosAsJson = GpxConverter.GetAllRoutesInfoPointsGeoJson(routesInfos.ToList());
                 var jsonRes = new JsonResult(routesInfosAsJson);
