@@ -43,6 +43,33 @@ namespace BikeRouteService.Controllers
             }
         }
 
+        [HttpDelete]
+        [Route("DeleteRoute")]
+        public async Task<IActionResult> DeleteRoute([FromQuery]string routeName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(routeName))
+                {
+                    return StatusCode(StatusCodes.Status405MethodNotAllowed, $"Route name was not provided!");
+                }
+                
+                Route routeObject = await routesRepository.GetAsync(r => r.RouteName == routeName);
+
+                if (routeObject == null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, $"Route with name {routeName} not found");
+                }
+
+                await routesRepository.DeleteAsync(r => r.RouteName == routeName);
+                return StatusCode(StatusCodes.Status200OK);
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, exception.Message);
+            }
+        }
+        
         [HttpGet]
         [Route("GetRouteGeoJsonByName")]
         public async Task<IActionResult> GetRouteGeoJsonByName([FromQuery]string routeName)
@@ -158,7 +185,7 @@ namespace BikeRouteService.Controllers
             };
         }
 
-        private Route BuildGeoJsonRouteObject(IFormFile routeObject, string routeName, RouteDifficulty difficulty, RouteType routeType)
+        private Route BuildGeoJsonRouteObject(IFormFile routeFile, string routeName, RouteDifficulty difficulty, RouteType routeType)
         {
             //TODO: add routeobject builder as intermidiate
             Route route = new Route
@@ -168,19 +195,22 @@ namespace BikeRouteService.Controllers
                 RouteType = routeType
             };
 
-            switch (routeObject.GetFileExtension())
+            switch (routeFile.GetFileExtension())
             {
                 case FileExtension.Gpx:
                     
                     route.OrigFileExtension = "gpx";
-                    route.OrigFileContent = routeObject.GetBytes();
-                    GpxConverter.ConvertGpxToGeoJson(routeObject.OpenReadStream(), route);
+                    route.OrigFileContent = routeFile.GetBytes();
+                    GpxConverter.ConvertGpxToGeoJson(routeFile.OpenReadStream(), route);
                     break;
                 
                 case FileExtension.GeoJson:
-                    
+                    route.OrigFileExtension = "geojson";
+                    route.OrigFileContent = routeFile.GetBytes();
+                    route.GeoJsonFileContent = route.OrigFileContent;
                     break;
                 
+                //TODO: should we support this?
                 case FileExtension.Kml:
                     
                     break;

@@ -47,8 +47,8 @@ namespace Core.Common.Mongo
         public async Task UpdateAsync(TEntity entity)
             => await Collection.ReplaceOneAsync(e => e.Id == entity.Id, entity);
 
-        public async Task DeleteAsync(Guid id)
-            => await Collection.DeleteOneAsync(e => e.Id == id);
+        public async Task DeleteAsync(Expression<Func<TEntity, bool>> predicate)
+            => await Collection.DeleteOneAsync(predicate);
 
         public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
             => await Collection.Find(predicate).AnyAsync();

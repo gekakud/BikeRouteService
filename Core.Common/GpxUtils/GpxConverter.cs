@@ -41,7 +41,7 @@ namespace Core.Common.GpxUtils
 
                 routeToFill.ElevationGain = routeToFill.MaxAltitude - routeToFill.MinAltitude;
                 
-                var gjString = WriteGeoJson(positions);
+                string gjString = CreateGeoJsonStringForGpxRoute(positions, routeToFill);
                 routeToFill.GeoJsonFileContent = Encoding.ASCII.GetBytes(gjString);
             }
         }
@@ -71,18 +71,7 @@ namespace Core.Common.GpxUtils
         
         public static string GetRouteGeoJson(Route route)
         {
-            var featureProperties = new Dictionary<string, object>
-            {
-                { "RouteName", route.RouteName },
-                { "RouteType", route.RouteType},
-                { "RouteDifficulty", route.RouteDifficulty },
-                { "RouteLength", route.RouteLength }
-            };
-
-            var featureCollectionStr = ReadGeoJsonFromBytes(route.GeoJsonFileContent);
-            
-            FeatureCollection featureCollection = JsonConvert.DeserializeObject<FeatureCollection>(featureCollectionStr);
-            
+            string featureCollectionStr = ReadGeoJsonFromBytes(route.GeoJsonFileContent);
             return featureCollectionStr;
         }
         
@@ -91,12 +80,21 @@ namespace Core.Common.GpxUtils
             return Encoding.ASCII.GetString(gsBytes, 0, gsBytes.Length);
         }
         
-        private static string WriteGeoJson(List<Position> coordinates)
+        private static string CreateGeoJsonStringForGpxRoute(List<Position> coordinates, Route route)
         {
-            var line = new LineString(coordinates);
+            var featureProperties = new Dictionary<string, object>
+            {
+                {"RouteName", route.RouteName},
+                {"RouteType", route.RouteType},
+                {"RouteDifficulty", route.RouteDifficulty},
+                {"RouteLength", route.RouteLength},
+                {"ElevationGain", route.ElevationGain}
+            };
             
-            var lineJson = JsonConvert.SerializeObject(new Feature(line));
-            var featureCollection = new FeatureCollection(new List<Feature> {new Feature(line)});
+            var line = new LineString(coordinates);
+            var listOfFeatures = new List<Feature> {new Feature(line, featureProperties)};
+
+            var featureCollection = new FeatureCollection(listOfFeatures);
 
             var featureCollectionJson = JsonConvert.SerializeObject(featureCollection);
             return featureCollectionJson;

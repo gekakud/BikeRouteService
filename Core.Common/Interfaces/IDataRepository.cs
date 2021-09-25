@@ -14,7 +14,7 @@ namespace Core.Common.Interfaces
         Task<IEnumerable<TEntity>> GetAllDocsSpecificFieldsOnlyAsync(List<string> fieldsToInclude);
         Task AddAsync(TEntity entity);
         Task UpdateAsync(TEntity entity);
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(Expression<Func<TEntity, bool>> predicate);
         Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
     }
 }
