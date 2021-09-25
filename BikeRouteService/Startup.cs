@@ -1,3 +1,4 @@
+using System;
 using Autofac;
 using Core.Common.Mongo;
 using Core.Common.SharedDataObjects;
@@ -37,7 +38,17 @@ namespace BikeRouteService
             });
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "BikeRouteService", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "BikeRouteService", Version = "v1",
+                    Description = "An API to perform Employee operations",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Local dev map",
+                        Url = new Uri("http://localhost:6002"),
+                    }
+                });
+                
             });
         }
         // ConfigureContainer is where you can register things directly

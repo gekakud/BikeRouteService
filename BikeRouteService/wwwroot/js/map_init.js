@@ -1,7 +1,6 @@
 ﻿function initMap() {
 
     var markers = new Array(0);
-    var dataPoints = new Array(0);
     const initialZoom = 7.5;
     const routesApi = "http://localhost:6002/api/Routes/";
 
@@ -12,7 +11,9 @@
         center: [35.374668, 32.796048],
         zoom: initialZoom
     });
-
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+    
     var currentZoom = document.getElementById('zoom_id');
     currentZoom.textContent = initialZoom;
 
@@ -20,7 +21,6 @@
         currentZoom.textContent = map.getZoom();
     });
 
-    
     map.on('load', () => {
         initializeMap();
     });
@@ -121,11 +121,8 @@
         });
 
         $("#get_points").click(function () {
-            //{ version: "5", language: "php" }
             clearAll();
             initializeMap();
         });
-
     });
-
 }
