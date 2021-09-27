@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Core.Common.SharedDataObjects;
+using GeoJSON.Net;
+using GeoJSON.Net.Converters;
 using GeoJSON.Net.Feature;
 using GeoJSON.Net.Geometry;
 using Newtonsoft.Json;
@@ -39,8 +41,6 @@ namespace Core.Common.GpxUtils
                 routeToFill.MinAltitude = (double) positions.Select(p => p.Altitude).Min();
                 routeToFill.MaxAltitude = (double) positions.Select(p => p.Altitude).Max();
 
-                routeToFill.ElevationGain = routeToFill.MaxAltitude - routeToFill.MinAltitude;
-                
                 string gjString = CreateGeoJsonStringForGpxRoute(positions, routeToFill);
                 routeToFill.GeoJsonFileContent = Encoding.ASCII.GetBytes(gjString);
             }
@@ -74,6 +74,34 @@ namespace Core.Common.GpxUtils
             string featureCollectionStr = ReadGeoJsonFromBytes(route.GeoJsonFileContent);
             return featureCollectionStr;
         }
+
+        public static double CalculateElevationGainFromRouteGeoJson(Route route)
+        {
+            string featureCollectionStr = ReadGeoJsonFromBytes(route.GeoJsonFileContent);
+            FeatureCollection featureCollectionObject =
+                JsonConvert.DeserializeObject<FeatureCollection>(featureCollectionStr);
+
+            IGeometryObject geometryObject = featureCollectionObject.Features.Find(feature => feature.Geometry.Type == GeoJSONObjectType.LineString).Geometry;
+
+            LineString line = (LineString) geometryObject;
+
+            if (line.Coordinates.Count <= 2)
+            {
+                return 0;
+            }
+
+            double elevation = 0;
+            for (int i = 1; i < line.Coordinates.Count; i++)
+            {
+                if (line.Coordinates[i].Altitude > line.Coordinates[i - 1].Altitude)
+                {
+                    double gain = line.Coordinates[i].Altitude.Value - line.Coordinates[i - 1].Altitude.Value;
+                    elevation += gain;
+                }
+            }
+            
+            return elevation;
+        }
         
         private static string ReadGeoJsonFromBytes(byte[] gsBytes)
         {
@@ -82,7 +110,7 @@ namespace Core.Common.GpxUtils
         
         private static string CreateGeoJsonStringForGpxRoute(List<Position> coordinates, Route route)
         {
-            var featureProperties = new Dictionary<string, object>
+            var properties = new Dictionary<string, object>
             {
                 {"RouteName", route.RouteName},
                 {"RouteType", route.RouteType},
@@ -91,8 +119,9 @@ namespace Core.Common.GpxUtils
                 {"ElevationGain", route.ElevationGain}
             };
             
-            var line = new LineString(coordinates);
-            var listOfFeatures = new List<Feature> {new Feature(line, featureProperties)};
+            var lineGeometry = new LineString(coordinates);
+            
+            var listOfFeatures = new List<Feature> {new Feature(lineGeometry, properties)};
 
             var featureCollection = new FeatureCollection(listOfFeatures);
 

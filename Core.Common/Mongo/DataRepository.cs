@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Core.Common.Interfaces;
+using Core.Common.SharedDataObjects;
 using MongoDB.Driver;
 
 namespace Core.Common.Mongo
@@ -11,9 +12,12 @@ namespace Core.Common.Mongo
     {
         protected IMongoCollection<TEntity> Collection { get; }
 
-        public DataRepository(IMongoDatabase database, string collectionName)
+        public DataRepository(IMongoDbConfig mongoConfig)
         {
-            Collection = database.GetCollection<TEntity>(collectionName);
+            var client = new MongoClient(mongoConfig.ConnectionString);
+            var database = client.GetDatabase(mongoConfig.Database);
+
+            Collection = database.GetCollection<TEntity>(mongoConfig.Collection);
         }
 
         public async Task<TEntity> GetAsync(Guid id)

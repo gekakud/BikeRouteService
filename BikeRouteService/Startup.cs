@@ -1,5 +1,6 @@
 using System;
 using Autofac;
+using Core.Common.Interfaces;
 using Core.Common.Mongo;
 using Core.Common.SharedDataObjects;
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 
@@ -31,11 +33,23 @@ namespace BikeRouteService
                 // Use the default property (Pascal) casing
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
             });
+            
+            // register mongo config section
+            services.Configure<MongoDbConfig>(
+                Configuration.GetSection(nameof(MongoDbConfig)));
+
+            // register mongo config options
+            services.AddSingleton<IMongoDbConfig>(sp =>
+                sp.GetRequiredService<IOptions<MongoDbConfig>>().Value);
+            
+            services.AddSingleton<IDataRepository<Route>, DataRepository<Route>>();
+            
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = 
-                    $"{Configuration.GetValue<string>("redis:Server")}:{Configuration.GetValue<int>("redis:Port")}";
+                    $"{Configuration.GetValue<string>("Redis:Server")}:{Configuration.GetValue<int>("Redis:Port")}";
             });
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -48,21 +62,9 @@ namespace BikeRouteService
                         Url = new Uri("http://localhost:6002"),
                     }
                 });
-                
             });
         }
-        // ConfigureContainer is where you can register things directly
-        // with Autofac. This runs after ConfigureServices so the things
-        // here will override registrations made in ConfigureServices.
-        // Don't build the container; that gets done for you by the factory.
-        public void ConfigureContainer(ContainerBuilder builder)
-        {
-            // Register your own things directly with Autofac here. Don't
-            // call builder.Populate(), that happens in AutofacServiceProviderFactory
-            // for you.
-            builder.AddMongo();
-            builder.AddMongoRepository<Route>("routes_collection");
-        }
+        
         // Inside of Configure method we set up middleware that handles
         // every HTTP request that comes to our application
         // Configure is where you add middleware. This is called after

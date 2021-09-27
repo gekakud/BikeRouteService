@@ -83,8 +83,7 @@ namespace BikeRouteService.Controllers
                     return StatusCode(StatusCodes.Status404NotFound, $"Route with name {routeName} not found");
                 }
 
-                string ff = GpxConverter.GetRouteGeoJson(routeObject);
-                var jsonRes = new JsonResult(ff);
+                var jsonRes = new JsonResult(GpxConverter.GetRouteGeoJson(routeObject));
                 return jsonRes;
             }
             catch (Exception exception)
@@ -218,7 +217,8 @@ namespace BikeRouteService.Controllers
                 default:
                     throw new Exception("Not supported file format");
             }
-            
+
+            route.ElevationGain = GpxConverter.CalculateElevationGainFromRouteGeoJson(route);
             return route;
         }
     }
