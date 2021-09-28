@@ -2,8 +2,9 @@
 
 function initMap() {
 
-    var markers = new Array(0);
-    const initialZoom = 7.5;
+    var markers = new Map();
+    const initialZoom = 8;
+    const routeListZoom = 11;
     const routesApi = "http://localhost:6002/api/Routes/";
 
     mapboxgl.accessToken = 'pk.eyJ1IjoiZ2VrYXBlayIsImEiOiJja3J3MDc5aDUwYnVtMnZuODI3bnN4bWo4In0.Y7ifVj3T99VpyiLNuLEVnQ';
@@ -37,71 +38,79 @@ function initMap() {
                 for (let i = 0; i < allRoutesInfoGeoJson.features.length; i++) {
                     const pointGeometry = allRoutesInfoGeoJson.features[i].geometry;
                     const pointProps = allRoutesInfoGeoJson.features[i].properties;
-
-                    const popup = new mapboxgl.Popup({
-                        closeButton: false,
-                        closeOnClick: false,
-                        offset: 25
-                    }).setHTML(`<h3>Name: ${pointProps.RouteName}</h3> 
-                    <p>Type:${pointProps.RouteType}</p> 
-                    <p>Length:${pointProps.RouteLength}</p>
-                    <p>Difficulty:${pointProps.RouteDifficulty}</p>
-                    <p>Elevation gain:${pointProps.ElevationGain}</p>`);
-
-                    markers[i] = new mapboxgl.Marker({
-                            color: 'green'
-                        })
-                        .setLngLat([pointGeometry.coordinates[0], pointGeometry.coordinates[1]])
-                        .setPopup(popup);
-
-                    const markerDiv = markers[i].getElement();
-
-                    markerDiv.addEventListener('mouseenter', () => markers[i].togglePopup());
-                    markerDiv.addEventListener('mouseleave', () => markers[i].togglePopup());
-
-                    markerDiv.addEventListener('click', () => {
-                        // map.flyTo({center: pointGeometry.coordinates, zoom: 14});
-                        markers[i].togglePopup();
-                        $.get(routesApi + "GetRouteGeoJsonByName", {
-                                routeName: pointProps.RouteName
-                            })
-                            .done(function (jsonResponse) {
-                                var geoJsonStr = JSON.parse(jsonResponse);
-
-                                viewPort.updateView(geoJsonStr);
-                                clearRouteLayer();
-
-                                map.addSource('route', {
-                                    'type': 'geojson',
-                                    'data': geoJsonStr
-                                });
-
-                                map.addLayer({
-                                    'id': 'route-layer',
-                                    'type': 'line',
-                                    'source': 'route',
-                                    'layout': {
-                                        'line-join': 'round',
-                                        'line-cap': 'round'
-                                    },
-                                    'paint': {
-                                        'line-color': '#d43811',
-                                        'line-width': 5
-                                    }
-                                });
-                            });
-                    });
+                    createAllRoutesMarkers(pointGeometry, pointProps, i);
                 }
 
                 map.flyTo({
-                    center: allRoutesInfoGeoJson.features[0].geometry.coordinates
+                    center: allRoutesInfoGeoJson.features[0].geometry.coordinates,
+                    zoom: initialZoom
                 });
                 loadMarkersData();
+                showAllRoutesList();
             })
             .fail(function (jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;
                 alert("Request Failed: " + err);
             });
+    }
+
+    function createAllRoutesMarkers(pointGeometry, pointProps) {
+        const popup = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: false,
+            offset: 25
+        }).setHTML(`<h3>Name: ${pointProps.RouteName}</h3> 
+                    <p>Type:${pointProps.RouteType}</p> 
+                    <p>Length:${pointProps.RouteLength}</p>
+                    <p>Difficulty:${pointProps.RouteDifficulty}</p>
+                    <p>Elevation gain:${pointProps.ElevationGain}</p>`);
+
+
+        const routeMarker = new mapboxgl.Marker({
+                color: 'green'
+            })
+            .setLngLat([pointGeometry.coordinates[0], pointGeometry.coordinates[1]])
+            .setPopup(popup);
+
+        const markerDiv = routeMarker.getElement();
+
+        markerDiv.addEventListener('mouseenter', () => routeMarker.togglePopup());
+        markerDiv.addEventListener('mouseleave', () => routeMarker.togglePopup());
+
+        markerDiv.addEventListener('click', () => {
+            routeMarker.togglePopup();
+            $.get(routesApi + "GetRouteGeoJsonByName", {
+                    routeName: pointProps.RouteName
+                })
+                .done(function (jsonResponse) {
+                    var geoJsonStr = JSON.parse(jsonResponse);
+
+                    viewPort.updateView(geoJsonStr);
+                    clearRouteLayer();
+                    clearAllRoutesList();
+
+                    map.addSource('route', {
+                        'type': 'geojson',
+                        'data': geoJsonStr
+                    });
+
+                    map.addLayer({
+                        'id': 'route-layer',
+                        'type': 'line',
+                        'source': 'route',
+                        'layout': {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        'paint': {
+                            'line-color': '#d43811',
+                            'line-width': 5
+                        }
+                    });
+                });
+        });
+
+        markers.set(pointProps.RouteName, routeMarker);
     }
 
     function clearRouteLayer() {
@@ -116,17 +125,48 @@ function initMap() {
     }
 
     function loadMarkersData() {
-        for (let i = 0; i < markers.length; i++) {
-            markers[i].addTo(map);
+        for (const value of markers.values()) {
+            value.addTo(map);
         }
     }
 
     function clearAll() {
-        for (let i = 0; i < markers.length; i++) {
-            markers[i].remove();
+        for (const value of markers.values()) {
+            value.remove();
         }
 
         clearRouteLayer();
+        markers.clear();
+        clearAllRoutesList();
+    }
+
+    function showAllRoutesList() {
+        let list = document.getElementById("all_routes_list");
+
+        for (const [key, value] of markers) {
+            let li = document.createElement("li");
+            li.innerText = key;
+
+            li.addEventListener('mouseover', () => {
+                // Highlight corresponding feature on the map
+                map.flyTo({
+                    center: value.getLngLat(),
+                    zoom: routeListZoom
+                });
+                value.togglePopup();
+            });
+
+            li.addEventListener('mouseout', () => {
+                // Highlight corresponding feature on the map
+                value.togglePopup();
+            });
+
+            list.appendChild(li);
+        }
+    }
+
+    function clearAllRoutesList() {
+        document.getElementById("all_routes_list").innerHTML = '';
     }
 
     $(document).ready(function () {
@@ -134,7 +174,7 @@ function initMap() {
             clearAll();
         });
 
-        $("#get_points").click(function () {
+        $("#show_all_routes_markers").click(function () {
             clearAll();
             initializeMap();
         });

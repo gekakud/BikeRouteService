@@ -22,14 +22,19 @@
 
 <body onload="initMap()">
     <!-- The sidebar -->
-    <div class="sidebar">
+    <div class="map-overlay">
         <label>Route browser</label>
-        <input id="srv_ip" type="text" placeholder="Server ip">
-        <button id="get_points" class="btn btn-default">Get</button>
+        <br>
+        <button id="show_all_routes_markers" class="btn btn-default">Show all routes</button>
+        <br>
         <button id="clear_all" class="btn btn-default">Clear map</button>
         <p>Current zoom:</p>
         <p id="zoom_id">zoom</p>
         <br>
+        <div id="feature-listing" class="listing">
+            <ul  id="all_routes_list" class="listing_ul"></ul>
+        </div>
+        
     </div>
     
     <div id="map" class='map'></div>
