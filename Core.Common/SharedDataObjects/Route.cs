@@ -11,6 +11,10 @@ namespace Core.Common.SharedDataObjects
         public string RouteName { get; set; }
 
         public string RouteDescription { get; set; }
+
+        public bool ShowThisRouteOnMap { get; set; }
+        
+        public string Author { get; set; }
         
         public double RouteLength { get; set; }
 

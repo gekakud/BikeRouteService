@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Common.Extensions;
@@ -94,7 +95,7 @@ namespace BikeRouteService.Controllers
         
         [HttpPost]
         [Route("UploadRouteFile")]
-        public async Task<IActionResult> UploadRouteFile(IFormFile routeFile, string routeName, RouteDifficulty difficulty, RouteType routeType)
+        public async Task<IActionResult> UploadRouteFile([Required]IFormFile routeFile, [Required]string routeName, [Required]RouteDifficulty difficulty, [Required]RouteType routeType)
         {
             try
             {
@@ -116,7 +117,7 @@ namespace BikeRouteService.Controllers
         
         [HttpGet]
         [Route("DownloadRouteFile")]
-        public async Task<IActionResult> DownloadRouteFile(string routeName, FileExtension fileExtension = FileExtension.NotSupported)
+        public async Task<IActionResult> DownloadRouteFile([Required]string routeName, FileExtension fileExtension = FileExtension.NotSupported)
         {
             try
             {
@@ -148,7 +149,7 @@ namespace BikeRouteService.Controllers
 
         [HttpGet]
         [Route("DownloadRouteOriginalFile")]
-        public async Task<IActionResult> DownloadRouteOriginalFile(string routeName)
+        public async Task<IActionResult> DownloadRouteOriginalFile([Required]string routeName)
         {
             try
             {
