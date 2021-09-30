@@ -1,5 +1,6 @@
 using System;
 using Autofac;
+using BikeRouteService.Services;
 using Core.Common.Interfaces;
 using Core.Common.Mongo;
 using Core.Common.SharedDataObjects;
@@ -43,7 +44,7 @@ namespace BikeRouteService
                 sp.GetRequiredService<IOptions<MongoDbConfig>>().Value);
             
             services.AddSingleton<IDataRepository<Route>, DataRepository<Route>>();
-            
+            services.AddSingleton(typeof(RoutesService));
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = 

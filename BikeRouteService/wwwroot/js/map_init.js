@@ -170,6 +170,30 @@ function initMap() {
     }
 
     $(document).ready(function () {
+        $("#fileUpload").on('change', function () {
+            var files = $('#fileUpload').prop("files");                
+            var url = routesApi + "UploadRouteFile?" + "routeName=justname" + "&" + "difficulty=2" + "&" + "routeType=2";
+            formData = new FormData();
+            formData.append("routeFile", files[0]);
+
+            jQuery.ajax({
+                type: 'POST',
+                url: url,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (repo) {
+                    if (repo.status == "success") {
+                        alert("File : " + repo.filename + " is uploaded successfully");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
+                  }
+            });
+        }); 
+
         $("#clear_all").click(function () {
             clearAll();
         });

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using BikeRouteService.Services;
 using Core.Common.Extensions;
 using Core.Common.Interfaces;
 using Core.Common.SharedDataObjects;
@@ -17,12 +18,14 @@ namespace BikeRouteService.Controllers
     [Route("api/[controller]")]
     public class RoutesController : ControllerBase
     {
-        private readonly ILogger<RoutesController> _logger;
-        private readonly IDataRepository<Route> routesRepository;
-        public RoutesController(ILogger<RoutesController> logger, IDataRepository<Route> _routesDataRepo)
+        private readonly ILogger<RoutesController> Logger;
+        private readonly IDataRepository<Route> RoutesRepository;
+        private readonly RoutesService RoutesService;
+        public RoutesController(RoutesService routeService, ILogger<RoutesController> logger, IDataRepository<Route> routesDataRepo)
         {
-            _logger = logger;
-            routesRepository = _routesDataRepo;
+            Logger = logger;
+            RoutesRepository = routesDataRepo;
+            RoutesService = routeService;
         }
 
         [HttpGet]
@@ -33,7 +36,7 @@ namespace BikeRouteService.Controllers
             {
                 // TODO: list properties names should not be hardcoded
                 var fieldsToFetch = new List<string> { "RouteLength", "RouteName", "RouteDifficulty", "RouteType", "StartLat", "StartLng", "ElevationGain" };
-                IEnumerable<Route> routesInfos = await routesRepository.GetAllDocsSpecificFieldsOnlyAsync(fieldsToFetch);
+                IEnumerable<Route> routesInfos = await RoutesRepository.GetAllDocsSpecificFieldsOnlyAsync(fieldsToFetch);
                 string routesInfosAsJson = GpxConverter.GetAllRoutesInfoPointsGeoJson(routesInfos.ToList());
                 var jsonRes = new JsonResult(routesInfosAsJson);
                 return jsonRes;
@@ -55,14 +58,14 @@ namespace BikeRouteService.Controllers
                     return StatusCode(StatusCodes.Status405MethodNotAllowed, $"Route name was not provided!");
                 }
                 
-                Route routeObject = await routesRepository.GetAsync(r => r.RouteName == routeName);
+                Route routeObject = await RoutesRepository.GetAsync(r => r.RouteName == routeName);
 
                 if (routeObject == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, $"Route with name {routeName} not found");
                 }
 
-                await routesRepository.DeleteAsync(r => r.RouteName == routeName);
+                await RoutesRepository.DeleteAsync(r => r.RouteName == routeName);
                 return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception exception)
@@ -77,7 +80,7 @@ namespace BikeRouteService.Controllers
         {
             try
             {
-                Route routeObject = await routesRepository.GetAsync(r => r.RouteName == routeName);
+                Route routeObject = await RoutesRepository.GetAsync(r => r.RouteName == routeName);
 
                 if (routeObject == null)
                 {
@@ -95,22 +98,27 @@ namespace BikeRouteService.Controllers
         
         [HttpPost]
         [Route("UploadRouteFile")]
-        public async Task<IActionResult> UploadRouteFile([Required]IFormFile routeFile, [Required]string routeName, [Required]RouteDifficulty difficulty, [Required]RouteType routeType)
+        public async Task<IActionResult> UploadRouteFile([Required]IFormFile routeFile, string routeName, RouteDifficulty difficulty, RouteType routeType)
         {
             try
             {
-                if (routesRepository.ExistsAsync(r => r.RouteName == routeName).Result)
+                if (string.IsNullOrEmpty(routeName))
+                {
+                    throw new Exception("Route name parameter is incorrect!");
+                }
+                
+                if (RoutesRepository.ExistsAsync(r => r.RouteName == routeName).Result)
                 {
                     return StatusCode(StatusCodes.Status405MethodNotAllowed, $"Route with name {routeName} already exist");
                 }
                 
                 Route geoJsonRouteObject = BuildGeoJsonRouteObject(routeFile, routeName, difficulty, routeType);
-                await routesRepository.AddAsync(geoJsonRouteObject);
+                await RoutesRepository.AddAsync(geoJsonRouteObject);
                 return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception.Message);
+                Logger.LogError(exception.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, exception.Message);
             }
         }
@@ -126,7 +134,7 @@ namespace BikeRouteService.Controllers
                     return StatusCode(StatusCodes.Status404NotFound, "Must provide file extension");
                 }
                 
-                Route routeObject = await routesRepository.GetAsync(r => r.RouteName == routeName);
+                Route routeObject = await RoutesRepository.GetAsync(r => r.RouteName == routeName);
 
                 if (routeObject == null)
                 {
@@ -142,7 +150,7 @@ namespace BikeRouteService.Controllers
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception.Message);
+                Logger.LogError(exception.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, exception.Message);
             }
         }
@@ -153,7 +161,7 @@ namespace BikeRouteService.Controllers
         {
             try
             {
-                Route routeObject = await routesRepository.GetAsync(r => r.RouteName == routeName);
+                Route routeObject = await RoutesRepository.GetAsync(r => r.RouteName == routeName);
 
                 if (routeObject==null)
                 {
@@ -164,7 +172,7 @@ namespace BikeRouteService.Controllers
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception.Message);
+                Logger.LogError(exception.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, exception.Message);
             }
         }
