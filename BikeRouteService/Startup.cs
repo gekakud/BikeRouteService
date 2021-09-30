@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Autofac;
 using BikeRouteService.Services;
 using Core.Common.Interfaces;
@@ -6,8 +7,10 @@ using Core.Common.Mongo;
 using Core.Common.SharedDataObjects;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -80,8 +83,13 @@ namespace BikeRouteService
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BikeRouteService v1"));
             }
 
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
+            // app.UseDefaultFiles();
+            // app.UseStaticFiles();
+            
+            app.UseStaticFiles(new StaticFileOptions() {
+                FileProvider =  new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "client_web_app", "listing", "citybook")),
+                RequestPath = new PathString("/listing")
+            });
             
             app.UseHttpsRedirection();
             app.UseRouting();
