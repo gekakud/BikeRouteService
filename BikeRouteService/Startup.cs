@@ -31,6 +31,8 @@ namespace BikeRouteService
         // called by the runtime before the Configure method, below.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+            
             //disable camelCase policy - serialize properties names as it appears in a model
             services.AddControllers().AddNewtonsoftJson(options =>
             {
@@ -94,6 +96,11 @@ namespace BikeRouteService
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()); // allow credentials
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

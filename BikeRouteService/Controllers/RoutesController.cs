@@ -11,6 +11,7 @@ using Core.Common.Extensions;
 using Core.Common.Interfaces;
 using Core.Common.SharedDataObjects;
 using Core.Common.GpxUtils;
+using Microsoft.AspNetCore.Cors;
 
 namespace BikeRouteService.Controllers
 {
@@ -28,6 +29,7 @@ namespace BikeRouteService.Controllers
             RoutesService = routeService;
         }
 
+        [EnableCors]
         [HttpGet]
         [Route("GetAllRoutesInfo")]
         public async Task<IActionResult> GetAllRoutesInfo()
@@ -74,6 +76,7 @@ namespace BikeRouteService.Controllers
             }
         }
         
+        [EnableCors]
         [HttpGet]
         [Route("GetRouteGeoJsonByName")]
         public async Task<IActionResult> GetRouteGeoJsonByName([FromQuery]string routeName)
@@ -96,6 +99,7 @@ namespace BikeRouteService.Controllers
             }
         }
         
+        [EnableCors]
         [HttpPost]
         [Route("UploadRouteFile")]
         public async Task<IActionResult> UploadRouteFile([Required]IFormFile routeFile, string routeName, RouteDifficulty difficulty, RouteType routeType)
@@ -123,6 +127,7 @@ namespace BikeRouteService.Controllers
             }
         }
         
+        [EnableCors]
         [HttpGet]
         [Route("DownloadRouteFile")]
         public async Task<IActionResult> DownloadRouteFile([Required]string routeName, FileExtension fileExtension = FileExtension.NotSupported)
@@ -155,6 +160,7 @@ namespace BikeRouteService.Controllers
             }
         }
 
+        [EnableCors]
         [HttpGet]
         [Route("DownloadRouteOriginalFile")]
         public async Task<IActionResult> DownloadRouteOriginalFile([Required]string routeName)

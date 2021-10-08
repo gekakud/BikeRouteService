@@ -50,3 +50,13 @@ body { margin: 0; padding: 0; }
     .map-overlay .listing_ul li:hover {
     background: #cf1313;
     }
+
+    label {
+    display: block;
+    font: 2rem 'Fira Sans', sans-serif;
+}
+
+input,
+label {
+    margin: .4rem 0;
+}

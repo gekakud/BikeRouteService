@@ -169,10 +169,22 @@ function initMap() {
         document.getElementById("all_routes_list").innerHTML = '';
     }
 
+    function refreshMap(){
+        clearAll();
+        initializeMap();
+    }
+
     $(document).ready(function () {
-        $("#fileUpload").on('change', function () {
+        $("#btnUpload").click(function () {
+            var routeName = document.getElementById("routename").value;
+            var routeDiff = document.getElementById("difficulty").value;
+            var routeType = document.getElementById("routetype").value;
+
             var files = $('#fileUpload').prop("files");                
-            var url = routesApi + "UploadRouteFile?" + "routeName=justname" + "&" + "difficulty=2" + "&" + "routeType=2";
+            var url = routesApi + "UploadRouteFile?" + "routeName=" + routeName
+             + "&" + "difficulty=" + routeDiff 
+             + "&" + "routeType=" + routeType;
+
             formData = new FormData();
             formData.append("routeFile", files[0]);
 
@@ -187,6 +199,7 @@ function initMap() {
                     if (repo.status == "success") {
                         alert("File : " + repo.filename + " is uploaded successfully");
                     }
+                    refreshMap();
                 },
                 error: function(xhr, status, error) {
                     alert(xhr.responseText);
@@ -199,8 +212,7 @@ function initMap() {
         });
 
         $("#show_all_routes_markers").click(function () {
-            clearAll();
-            initializeMap();
+            refreshMap();
         });
     });
 }
