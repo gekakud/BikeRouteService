@@ -160,7 +160,7 @@ namespace BikeRouteService.Controllers
         [EnableCors]
         [HttpGet]
         [Route("DownloadRouteFile")]
-        public async Task<IActionResult> DownloadRouteFile([Required]string routeName, FileExtension fileExtension = FileExtension.NotSupported)
+        public async Task<IActionResult> DownloadRouteFile([Required]string routeName, FileExtension fileExtension = FileExtension.GeoJson)
         {
             try
             {

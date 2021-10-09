@@ -146,6 +146,9 @@ function initMap() {
         for (const [key, value] of markers) {
             let li = document.createElement("li");
             li.innerText = key;
+            li.setAttribute("id", "li_" + key);
+
+            
 
             li.addEventListener('mouseover', () => {
                 // Highlight corresponding feature on the map
@@ -162,9 +165,14 @@ function initMap() {
             });
 
             list.appendChild(li);
+            $("#li_" + key).click(function() {
+                downloadFile(key);
+              });
         }
     }
-
+    function downloadFile(routeName) {
+        window.location.href = routesApi + "DownloadRouteFile?" + "routeName=" + routeName;
+      }
     function clearAllRoutesList() {
         document.getElementById("all_routes_list").innerHTML = '';
     }
