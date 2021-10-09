@@ -1,62 +1,55 @@
-﻿
-body { margin: 0; padding: 0; }
-#map { position: absolute; top: 0; bottom: 0; width: 100%; }
-#map {
-    position: absolute;
-    left: 15%;
-    top: 0;
-    bottom: 0;
-    width: 85%;
+﻿body {
+  margin: 0;
+  padding: 0;
 }
-
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+#map {
+  position: absolute;
+  left: 15%;
+  top: 0;
+  bottom: 0;
+  width: 85%;
+}
 
 /* The side navigation menu */
 .map-overlay {
-    position: absolute;
-    width: 15%;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    font: 12px/20px 'Helvetica Neue',
-    Arial,
-    Helvetica,
-    sans-serif;
-    background-color: #efefef;
-    max-height: 100%;
-    overflow: hidden;
+  position: absolute;
+  width: 15%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+  background-color: #efefef;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .map-overlay .listing_ul {
-    overflow: auto;
-    max-height: 100%;
-    }
-     
-    .map-overlay .listing_ul > * {
-    display: block;
-    padding: 5px 10px;
-    margin: 0;
-    }
-     
-    .map-overlay .listing_ul li {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    color: rgb(20, 0, 68);
-    text-decoration: none;
-    }
-     
-    .map-overlay .listing_ul li:last-child {
-    border: none;
-    }
-     
-    .map-overlay .listing_ul li:hover {
-    background: #cf1313;
-    }
-
-    label {
-    display: block;
-    font: 2rem 'Fira Sans', sans-serif;
+  overflow: auto;
+  max-height: 100%;
 }
 
-input,
-label {
-    margin: .4rem 0;
+.map-overlay .listing_ul > * {
+  display: block;
+  padding: 5px 10px;
+  margin: 0;
+}
+
+.map-overlay .listing_ul li {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  color: rgb(20, 0, 68);
+  text-decoration: none;
+}
+
+.map-overlay .listing_ul li:last-child {
+  border: none;
+}
+
+.map-overlay .listing_ul li:hover {
+  background: #2831b9;
 }

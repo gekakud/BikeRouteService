@@ -37,14 +37,44 @@ namespace BikeRouteService.Controllers
             try
             {
                 // TODO: list properties names should not be hardcoded
-                var fieldsToFetch = new List<string> { "RouteLength", "RouteName", "RouteDifficulty", "RouteType", "StartLat", "StartLng", "ElevationGain" };
+                var fieldsToFetch = new List<string> { "VisibleToAll", "RouteLength", "RouteName", "RouteDifficulty", "RouteType", "StartLat", "StartLng", "ElevationGain" };
                 IEnumerable<Route> routesInfos = await RoutesRepository.GetAllDocsSpecificFieldsOnlyAsync(fieldsToFetch);
-                string routesInfosAsJson = GpxConverter.GetAllRoutesInfoPointsGeoJson(routesInfos.ToList());
+                string routesInfosAsJson = GpxConverter.GetAllRoutesInfoPointsGeoJson(routesInfos.Where(r => r.VisibleToAll == true).ToList());
                 var jsonRes = new JsonResult(routesInfosAsJson);
                 return jsonRes;
             }
             catch (Exception exception)
             {
+                return StatusCode(StatusCodes.Status500InternalServerError, exception.Message);
+            }
+        }
+
+        [EnableCors]
+        [HttpPost]
+        [Route("ApproveRoute")]
+        public async Task<IActionResult> ApproveRoute(string routeName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(routeName))
+                {
+                    throw new Exception("Route name parameter is incorrect!");
+                }
+
+                Route routeObject = await RoutesRepository.GetAsync(r => r.RouteName == routeName);
+
+                if (routeObject == null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, $"Route with name {routeName} not found");
+                }
+                routeObject.VisibleToAll = true;
+
+                await RoutesRepository.UpdateAsync(routeObject);
+                return StatusCode(StatusCodes.Status200OK);
+            }
+            catch (Exception exception)
+            {
+                Logger.LogError(exception.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, exception.Message);
             }
         }
@@ -206,16 +236,23 @@ namespace BikeRouteService.Controllers
             {
                 RouteName = routeName,
                 RouteDifficulty = difficulty,
-                RouteType = routeType
+                RouteType = routeType,
+                VisibleToAll = false
             };
 
             switch (routeFile.GetFileExtension())
             {
                 case FileExtension.Gpx:
-                    
                     route.OrigFileExtension = "gpx";
                     route.OrigFileContent = routeFile.GetBytes();
-                    GpxConverter.ConvertGpxToGeoJson(routeFile.OpenReadStream(), route);
+                    try
+                    {
+                        GpxConverter.ConvertGpxToGeoJson(routeFile.OpenReadStream(), route);
+                    }
+                    catch (Exception)
+                    {
+                        throw new Exception("Cannot correctly read GPX file. Please check file is in correct format.");
+                    }
                     break;
                 
                 case FileExtension.GeoJson:

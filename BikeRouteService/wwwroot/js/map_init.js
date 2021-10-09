@@ -169,7 +169,7 @@ function initMap() {
         document.getElementById("all_routes_list").innerHTML = '';
     }
 
-    function refreshMap(){
+    function refreshMap() {
         clearAll();
         initializeMap();
     }
@@ -180,10 +180,10 @@ function initMap() {
             var routeDiff = document.getElementById("difficulty").value;
             var routeType = document.getElementById("routetype").value;
 
-            var files = $('#fileUpload').prop("files");                
-            var url = routesApi + "UploadRouteFile?" + "routeName=" + routeName
-             + "&" + "difficulty=" + routeDiff 
-             + "&" + "routeType=" + routeType;
+            var files = $('#fileUpload').prop("files");
+            var url = routesApi + "UploadRouteFile?" + "routeName=" + routeName +
+                "&" + "difficulty=" + routeDiff +
+                "&" + "routeType=" + routeType;
 
             formData = new FormData();
             formData.append("routeFile", files[0]);
@@ -201,11 +201,11 @@ function initMap() {
                     }
                     refreshMap();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
-                  }
+                }
             });
-        }); 
+        });
 
         $("#clear_all").click(function () {
             clearAll();
