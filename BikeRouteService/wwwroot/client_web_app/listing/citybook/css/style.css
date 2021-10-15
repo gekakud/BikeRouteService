@@ -1538,6 +1538,7 @@ section.gray-section .section-separator {
 }
 .card-listing .geodir-category-location i , .card-listing .geodir-category-location a{
 	float:left;
+	padding-right: 30px;
 }
 .card-listing .geodir-category-location {
 	padding:15px 0 ;
@@ -1556,6 +1557,7 @@ section.gray-section .section-separator {
 	position:absolute;
 	right:-90px;
 	top:0;
+	left: 10px;
 	transition: all .2s ease-in-out;
 	opacity:0;
 	visibility:hidden;
@@ -1585,9 +1587,8 @@ section.gray-section .section-separator {
 	padding-left:10px;
 }
 .card-listing .listing-geodir-category {
-	position:absolute;
-	top:-20px;
-	left:20px;
+
+	float:right;
 	padding:10px 25px;
 	color:#fff;
 	border-radius:4px;
@@ -2016,7 +2017,7 @@ section.gray-section .section-separator {
 }
 .listing-item {
 	float:left;
-	width:50%;
+	width:100%;
 	padding:0 8px;
 	margin-bottom:12px;
 }
