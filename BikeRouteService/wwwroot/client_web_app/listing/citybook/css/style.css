@@ -168,7 +168,7 @@ blockquote p {
 	top:0;
 	left:0;
 	z-index:2;
-	opacity:0;
+	opacity:1;
 }
 .container{
 	max-width: 1224px;
@@ -3567,24 +3567,17 @@ article .list-single-main-item {
 .map-container {
 	float:left;
 	width:100%;
-	position:relative;
+	height: 100%;
+	width:50%;
+	position:absolute;
 	overflow: hidden;
+	right:0;
+	bottom: 0;
 }
 .fw-map {
 	height:600px;
 }
-.map-container.column-map {
-	width:50%;
-	position:fixed;
-	-webkit-transform: translate3d(0,0,0);
-	overflow: hidden;
-}
-.map-container.column-map.right-pos-map {
-	right:0;
-}
-.map-container.column-map.left-pos-map {
-	left:0;
-}
+
 .map-container #map-main{
     position: absolute;
 	top:0;

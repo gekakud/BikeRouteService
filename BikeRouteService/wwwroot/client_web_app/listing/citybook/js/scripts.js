@@ -2,16 +2,18 @@
 function initCitybook() {
     "use strict";
     //   loader ------------------
-    $(".loader-wrap").fadeOut(300, function () {
-        $("#main").animate({
-            opacity: "1"
-        }, 300);
-    });
+    // $(".loader-wrap").fadeOut(300, function () {
+    //     // $("#main").animate({
+    //     //     opacity: "1"
+    //     // }, 300);
+    // });
     //   Background image ------------------
     var a = $(".bg");
     a.each(function (a) {
         if ($(this).attr("data-bg")) $(this).css("background-image", "url(" + $(this).data("bg") + ")");
     });
+
+    initMap();
     //   scrollToFixed------------------
     $(".fixed-bar").scrollToFixed({
         minWidth: 1064,
@@ -120,9 +122,7 @@ function initCitybook() {
         dots: true,
         arrows: false,
     });
-     $('.slider-container').on('init', function(event, slick){
- initAutocomplete();
-        });
+
     sbp.on("click", function () {
         $(this).closest(".slider-container-wrap").find('.slider-container').slick('slickPrev');
 
@@ -788,17 +788,6 @@ $('.fuzone input').each(function () {
         spinner.find("input.qty").trigger("change");
       });
     }); 
- function initAutocomplete() {
-            var input = document.getElementById('autocomplete-input');
-            var autocomplete = new google.maps.places.Autocomplete(input);
-            autocomplete.addListener('place_changed', function() {
-              var place = autocomplete.getPlace();
-              if (!place.geometry) {
-                window.alert("No details available for input: '" + place.name + "'");
-                return;
-              }
-            });		
-        }
 $(".notification-close").on("click", function () {
 	$(this).parent(".notification").slideUp(500);
 });
@@ -825,8 +814,3 @@ cahtwidbutton.on("click", function () {
 document.addEventListener('gesturestart', function (e) {
     e.preventDefault();
 }); 
-//   Init All ------------------
-$(function () {
-    initCitybook();
-    initparallax();
-});

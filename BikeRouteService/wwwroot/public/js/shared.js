@@ -1,0 +1,1 @@
+﻿var MAX_COORDINATE = 180.;

@@ -15,14 +15,26 @@
         <link type="text/css" rel="stylesheet" href="css/color.css">
         <!--=============== favicons ===============-->
         <link rel="shortcut icon" href="images/favicon.ico">
-        
+        <script type="text/javascript" src="js/shared.js"></script>
+    <script type="text/javascript" src="js/map_utils.js"></script>
+    <script type="text/javascript" src="js/map_init.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!--=============== scripts  ===============-->
+    <!-- <script type="text/javascript" src="js/jquery.min.js"></script> -->
+    <script type="text/javascript" src="js/plugins.js"></script>
+    <script type="text/javascript" src="js/scripts.js"></script>
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOURAPIKEYHERE&libraries=places&callback=initAutocomplete"></script> -->
+    <script type="text/javascript" src="js/map_infobox.js"></script>
+    <!-- <script type="text/javascript" src="js/markerclusterer.js"></script>   -->
+    <!-- <script type="text/javascript" src="js/maps.js"></script> -->
     </head>
-    <body>
+    <body onload="initCitybook()">
         <!--loader-->
-        <div class="loader-wrap">
+        <!-- <div class="loader-wrap">
             <div class="pin"></div>
             <div class="pulse"></div>
-        </div>
+        </div> -->
         <!--loader end-->
         <!-- Main  -->
         <div id="main">
@@ -82,8 +94,7 @@
             <div id="wrapper">
                 <div class="content">
                     <!-- Map -->
-                    <div class="map-container column-map right-pos-map">
-                        <div id="map-main"></div>						
+                    <div id="map-main" class="map-container">				 -->
                     </div>
                     <!-- Map end -->          
                     <!--col-list-wrap -->   
@@ -247,13 +258,6 @@
             <!--register form end -->
         </div>
         <!-- Main end -->
-        <!--=============== scripts  ===============-->
-        <script type="text/javascript" src="js/jquery.min.js"></script>
-        <script type="text/javascript" src="js/plugins.js"></script>
-        <script type="text/javascript" src="js/scripts.js"></script>
-		<script src="https://maps.googleapis.com/maps/api/js?key=YOURAPIKEYHERE&libraries=places&callback=initAutocomplete"></script>
-        <script type="text/javascript" src="js/map_infobox.js"></script>
-        <script type="text/javascript" src="js/markerclusterer.js"></script>  
-        <script type="text/javascript" src="js/maps.js"></script>
+        
     </body>
 </html>

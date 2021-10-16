@@ -85,13 +85,13 @@ namespace BikeRouteService
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BikeRouteService v1"));
             }
 
-            // app.UseDefaultFiles();
-            // app.UseStaticFiles();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             
-            app.UseStaticFiles(new StaticFileOptions() {
-                FileProvider =  new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "client_web_app", "listing", "citybook")),
-                RequestPath = new PathString("/listing")
-            });
+            //app.UseStaticFiles(new StaticFileOptions() {
+            //    FileProvider =  new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "client_web_app", "listing", "citybook")),
+            //    RequestPath = new PathString("/listing")
+            //});
             
             app.UseHttpsRedirection();
             app.UseRouting();
