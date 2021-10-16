@@ -10,16 +10,16 @@
 }
 #map {
   position: absolute;
-  left: 15%;
+  left: 25%;
   top: 0;
   bottom: 0;
-  width: 85%;
+  width: 75%;
 }
 
 /* The side navigation menu */
 .map-overlay {
   position: absolute;
-  width: 15%;
+  width: 25%;
   top: 0;
   bottom: 0;
   left: 0;
@@ -27,6 +27,7 @@
   background-color: #efefef;
   max-height: 100%;
   overflow: hidden;
+  /* margin: 5px;; */
 }
 
 .map-overlay .listing_ul {

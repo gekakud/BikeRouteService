@@ -1,16 +1,12 @@
 using System;
-using System.IO;
-using Autofac;
 using BikeRouteService.Services;
 using Core.Common.Interfaces;
 using Core.Common.Mongo;
 using Core.Common.SharedDataObjects;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -65,7 +61,7 @@ namespace BikeRouteService
                     Contact = new OpenApiContact
                     {
                         Name = "Local dev map",
-                        Url = new Uri("http://localhost:6002"),
+                        Url = new Uri("http://localhost:6001"),
                     }
                 });
             });

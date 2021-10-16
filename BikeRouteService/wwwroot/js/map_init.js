@@ -5,7 +5,7 @@ function initMap() {
     var markers = new Map();
     const initialZoom = 8;
     const routeListZoom = 11;
-    const routesApi = "http://localhost:6002/api/Routes/";
+    const routesApi = "http://localhost:6001/api/Routes/";
 
     mapboxgl.accessToken = 'pk.eyJ1IjoiZ2VrYXBlayIsImEiOiJja3J3MDc5aDUwYnVtMnZuODI3bnN4bWo4In0.Y7ifVj3T99VpyiLNuLEVnQ';
     const map = new mapboxgl.Map({
