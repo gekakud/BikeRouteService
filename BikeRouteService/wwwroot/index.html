@@ -23,34 +23,50 @@
   <!-- The sidebar -->
   <div class="map-overlay">
     <div class="container">
-      <h2>Route browser</h2>
-    <div class="d-grid gap-2">
-      <button id="show_all_routes_markers" class="btn btn-primary">
-        Show all routes
-      </button>
-      <button id="clear_all" class="btn btn-primary">Clear map</button>
-    </div>
+      <div class="d-grid gap-2">
+        <button id="show_all_routes_markers" class="btn btn-primary">
+          Show all routes
+        </button>
+        <button id="clear_all" class="btn btn-primary">Clear map</button>
+      </div>
 
-    <br />
+      <br />
 
-    <h4>Current zoom:</h4>
-    <p id="zoom_id">zoom</p>
-    <br />
-    <div id="feature-listing" class="listing">
-      <ul id="all_routes_list" class="listing_ul list-group"></ul>
-    </div>
+      <div id="feature-listing" class="listing">
+        <ul id="all_routes_list" class="list-group listing_ul"></ul>
+      </div>
 
-    <div class="mb-3">
-      <label for="name" class="form-label">Route name:</label>
-      <input type="text" class="form-control" placeholder="Route name" id="routename" required />
-      <label for="name" class="form-label">Difficulty:</label>
-      <input type="text" class="form-control" placeholder="1-5" id="difficulty" required />
-      <label for="name" class="form-label">Route type:</label>
-      <input type="text" class="form-control" placeholder="1-3" id="routetype" required />
-      <label for="name" class="form-label">File:</label>
-      <input type="file" class="form-control" id="fileUpload" required />
-      <button id="btnUpload" class="btn btn-primary">Upload</button>
-    </div>
+      <div class="mb-3">
+        <label for="name" class="form-label">Route name:</label>
+        <input type="text" class="form-control" placeholder="Route name" id="routename" required />
+        <label for="name" class="form-label">Difficulty:</label>
+
+        <div class="input-group">
+          <select class="form-control" id="difficulty_selector">
+            <option value="0">Beginner</option>
+            <option value="1">Intermediate</option>
+            <option value="2">Proficient</option>
+            <option value="3">Beast</option>
+          </select>
+        </div>
+
+        <label for="name" class="form-label">Route type:</label>
+
+        <div class="input-group">
+          <select class="form-control" id="route_selector">
+            <option value="0">Mtb</option>
+            <option value="1">Gravel</option>
+            <option value="2">Road</option>
+            <option value="3">Mixed</option>
+          </select>
+        </div>
+
+        <label for="name" class="form-label">File:</label>
+        <input type="file" class="form-control" id="fileUpload" required />
+        <button id="btnUpload" class="btn btn-primary">Upload</button>
+
+      </div>
+
     </div>
   </div>
 

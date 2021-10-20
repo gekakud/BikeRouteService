@@ -5,7 +5,10 @@ function initMap() {
     var markers = new Map();
     const initialZoom = 8;
     const routeListZoom = 11;
-    const routesApi = "http://localhost:6001/api/Routes/";
+    var apiUrlDev = "http://localhost:6001";
+    var apiUrlProd = "https://bikeroutewin.azurewebsites.net";
+
+    var routesApi = apiUrlDev + "/api/Routes/";
 
     mapboxgl.accessToken = 'pk.eyJ1IjoiZ2VrYXBlayIsImEiOiJja3J3MDc5aDUwYnVtMnZuODI3bnN4bWo4In0.Y7ifVj3T99VpyiLNuLEVnQ';
     const map = new mapboxgl.Map({
@@ -17,12 +20,6 @@ function initMap() {
     // Add zoom and rotation controls to the map.
     map.addControl(new mapboxgl.NavigationControl());
     viewPort = new ViewPort(map);
-    var currentZoom = document.getElementById('zoom_id');
-    currentZoom.textContent = initialZoom;
-
-    map.on('zoom', () => {
-        currentZoom.textContent = map.getZoom();
-    });
 
     map.on('load', () => {
         initializeMap();
@@ -147,8 +144,7 @@ function initMap() {
             let li = document.createElement("li");
             li.innerText = key;
             li.setAttribute("id", "li_" + key);
-
-            
+            li.setAttribute("class", "list-group-item list-group-item-light");
 
             li.addEventListener('mouseover', () => {
                 // Highlight corresponding feature on the map
@@ -182,11 +178,20 @@ function initMap() {
         initializeMap();
     }
 
+    function isEmpty(str) {
+        return (!str || str.length === 0 );
+    }
+
     $(document).ready(function () {
         $("#btnUpload").click(function () {
             var routeName = document.getElementById("routename").value;
-            var routeDiff = document.getElementById("difficulty").value;
-            var routeType = document.getElementById("routetype").value;
+            var routeDiff = document.getElementById("difficulty_selector").value;
+            var routeType = document.getElementById("route_selector").value;
+
+            if(isEmpty(routeName) || isEmpty(routeDiff) || isEmpty(routeType)){
+                alert("Fill all fields!");
+                return;
+            }
 
             var files = $('#fileUpload').prop("files");
             var url = routesApi + "UploadRouteFile?" + "routeName=" + routeName +

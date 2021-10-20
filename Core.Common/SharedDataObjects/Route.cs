@@ -48,8 +48,8 @@ namespace Core.Common.SharedDataObjects
     {
         NotSupported,
         Gpx,
-        GeoJson,
-        Kml
+        Kml,
+        GeoJson
     }
 
     public enum RouteType

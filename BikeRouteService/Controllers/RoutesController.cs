@@ -12,6 +12,7 @@ using Core.Common.Interfaces;
 using Core.Common.SharedDataObjects;
 using Core.Common.GpxUtils;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.Extensions.Configuration;
 
 namespace BikeRouteService.Controllers
 {
@@ -22,8 +23,10 @@ namespace BikeRouteService.Controllers
         private readonly ILogger<RoutesController> Logger;
         private readonly IDataRepository<Route> RoutesRepository;
         private readonly RoutesService RoutesService;
-        public RoutesController(RoutesService routeService, ILogger<RoutesController> logger, IDataRepository<Route> routesDataRepo)
+        private readonly IConfiguration Config;
+        public RoutesController(IConfiguration config, RoutesService routeService, ILogger<RoutesController> logger, IDataRepository<Route> routesDataRepo)
         {
+            Config = config;
             Logger = logger;
             RoutesRepository = routesDataRepo;
             RoutesService = routeService;
@@ -39,7 +42,7 @@ namespace BikeRouteService.Controllers
                 // TODO: list properties names should not be hardcoded
                 var fieldsToFetch = new List<string> { "VisibleToAll", "RouteLength", "RouteName", "RouteDifficulty", "RouteType", "StartLat", "StartLng", "ElevationGain" };
                 IEnumerable<Route> routesInfos = await RoutesRepository.GetAllDocsSpecificFieldsOnlyAsync(fieldsToFetch);
-                string routesInfosAsJson = GpxConverter.GetAllRoutesInfoPointsGeoJson(routesInfos.Where(r => r.VisibleToAll == true).ToList());
+                string routesInfosAsJson = GeoConverter.GetAllRoutesInfoPointsGeoJson(routesInfos.Where(r => r.VisibleToAll == true).ToList());
                 var jsonRes = new JsonResult(routesInfosAsJson);
                 return jsonRes;
             }
@@ -120,7 +123,7 @@ namespace BikeRouteService.Controllers
                     return StatusCode(StatusCodes.Status404NotFound, $"Route with name {routeName} not found");
                 }
 
-                var jsonRes = new JsonResult(GpxConverter.GetRouteGeoJson(routeObject));
+                var jsonRes = new JsonResult(GeoConverter.GetRouteGeoJson(routeObject));
                 return jsonRes;
             }
             catch (Exception exception)
@@ -212,7 +215,20 @@ namespace BikeRouteService.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, exception.Message);
             }
         }
-        
+        [EnableCors]
+        [HttpGet]
+        [Route("IsDevelopment")]
+        public IActionResult IsDevelopment()
+        {
+            try
+            {
+                return new JsonResult(Config.GetSection("IsDevelopment").Value);
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, exception.Message);
+            }
+        }
         private FileContentResult GetRouteAsOriginalFile(Route routeData)
         {
             return new FileContentResult(routeData.OrigFileContent, $"application/{routeData.OrigFileExtension}")
@@ -247,7 +263,7 @@ namespace BikeRouteService.Controllers
                     route.OrigFileContent = routeFile.GetBytes();
                     try
                     {
-                        GpxConverter.ConvertGpxToGeoJson(routeFile.OpenReadStream(), route);
+                        GeoConverter.ConvertGpxToGeoJson(routeFile.OpenReadStream(), route);
                     }
                     catch (Exception)
                     {
@@ -255,22 +271,26 @@ namespace BikeRouteService.Controllers
                     }
                     break;
                 
-                case FileExtension.GeoJson:
-                    route.OrigFileExtension = "geojson";
-                    route.OrigFileContent = routeFile.GetBytes();
-                    route.GeoJsonFileContent = route.OrigFileContent;
-                    break;
+                //case FileExtension.GeoJson:
+                //    route.OrigFileExtension = "geojson";
+                //    route.OrigFileContent = routeFile.GetBytes();
+                //    route.GeoJsonFileContent = route.OrigFileContent;
+                //    GeoConverter.MapGeoJsonToRoute(route);
+                //    break;
                 
                 //TODO: should we support this?
                 case FileExtension.Kml:
-                    
+                    route.OrigFileExtension = "kml";
+                    route.OrigFileContent = routeFile.GetBytes();
+                    route.GeoJsonFileContent = route.OrigFileContent;
+                    GeoConverter.MapKmlToRoute(route);
                     break;
                 
                 default:
                     throw new Exception("Not supported file format");
             }
 
-            route.ElevationGain = GpxConverter.CalculateElevationGainFromRouteGeoJson(route);
+            route.ElevationGain = GeoConverter.CalculateElevationGainFromRouteGeoJson(route);
             return route;
         }
     }

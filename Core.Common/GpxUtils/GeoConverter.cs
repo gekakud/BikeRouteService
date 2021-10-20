@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Core.Common.SharedDataObjects;
 using GeoJSON.Net;
-using GeoJSON.Net.Converters;
 using GeoJSON.Net.Feature;
 using GeoJSON.Net.Geometry;
 using Newtonsoft.Json;
 
 namespace Core.Common.GpxUtils
 {
-    public static class GpxConverter
+    public static class GeoConverter
     {
         public static void ConvertGpxToGeoJson(Stream gpxFileStream, Route routeToFill)
         {
@@ -46,6 +44,32 @@ namespace Core.Common.GpxUtils
             }
         }
 
+        public static void MapKmlToRoute(Route routeToFill)
+        {
+            
+            string featureCollectionStr = ReadGeoJsonFromBytes(routeToFill.GeoJsonFileContent);
+            
+            FeatureCollection featureCollectionObject =
+                JsonConvert.DeserializeObject<FeatureCollection>(featureCollectionStr);
+
+            IGeometryObject geometryObject = featureCollectionObject.Features.Find(feature => feature.Geometry.Type == GeoJSONObjectType.LineString).Geometry;
+
+            LineString line = (LineString)geometryObject;
+            var tt = 5;
+            //routeToFill.RouteLength = (float)track.GetLength();
+
+            //routeToFill.StartLat = positions.First().Latitude;
+            //routeToFill.StartLng = positions.First().Longitude;
+
+            //routeToFill.EndLat = positions.Last().Latitude;
+            //routeToFill.EndLng = positions.Last().Longitude;
+
+            //routeToFill.MinAltitude = (double)positions.Select(p => p.Altitude).Min();
+            //routeToFill.MaxAltitude = (double)positions.Select(p => p.Altitude).Max();
+
+            //string gjString = CreateGeoJsonStringForGpxRoute(positions, routeToFill);
+            //routeToFill.GeoJsonFileContent = Encoding.ASCII.GetBytes(gjString);
+        }
         public static string GetAllRoutesInfoPointsGeoJson(List<Route> routes)
         {
             var geoFeatures = new List<Feature>();
