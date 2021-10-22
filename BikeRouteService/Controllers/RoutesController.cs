@@ -265,8 +265,9 @@ namespace BikeRouteService.Controllers
                     {
                         GeoConverter.ConvertGpxToGeoJson(routeFile.OpenReadStream(), route);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Logger.LogError(e.Message);
                         throw new Exception("Cannot correctly read GPX file. Please check file is in correct format.");
                     }
                     break;

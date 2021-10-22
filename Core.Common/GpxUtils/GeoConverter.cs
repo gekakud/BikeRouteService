@@ -36,8 +36,8 @@ namespace Core.Common.GpxUtils
                 routeToFill.EndLat = positions.Last().Latitude;
                 routeToFill.EndLng = positions.Last().Longitude;
                 
-                routeToFill.MinAltitude = (double) positions.Select(p => p.Altitude).Min();
-                routeToFill.MaxAltitude = (double) positions.Select(p => p.Altitude).Max();
+                routeToFill.MinAltitude = (double)positions.Select(p => p.Altitude ?? 0).Min();
+                routeToFill.MaxAltitude = (double) positions.Select(p => p.Altitude ?? 0).Max();
 
                 string gjString = CreateGeoJsonStringForGpxRoute(positions, routeToFill);
                 routeToFill.GeoJsonFileContent = Encoding.ASCII.GetBytes(gjString);
