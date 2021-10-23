@@ -3,6 +3,19 @@
 function initMap() {
 
     var markers = new Map();
+    var routeDifficultyColors = { 
+        0 : 'green' , 
+        1 : 'blue' ,
+        2 : 'red' ,
+        3 : 'black' , 
+      };
+      var routeTypeColors = { 
+        //   mtb, gravel, road, mixed
+        0 : 'green' , 
+        1 : 'red' ,
+        2 : 'black' ,
+        3 : 'orange' , 
+      };
     const initialZoom = 8;
     const routeListZoom = 11;
     var apiUrlDev = "http://localhost:6001";
@@ -64,7 +77,7 @@ function initMap() {
 
 
         const routeMarker = new mapboxgl.Marker({
-                color: 'green'
+                color: routeTypeColors[pointProps.RouteType]
             })
             .setLngLat([pointGeometry.coordinates[0], pointGeometry.coordinates[1]])
             .setPopup(popup);
@@ -100,7 +113,7 @@ function initMap() {
                             'line-cap': 'round'
                         },
                         'paint': {
-                            'line-color': '#d43811',
+                            'line-color': routeDifficultyColors[pointProps.RouteDifficulty],
                             'line-width': 5
                         }
                     });
@@ -226,6 +239,13 @@ function initMap() {
 
         $("#show_all_routes_markers").click(function () {
             refreshMap();
+        });
+
+        $("#filter_routes_btn").click(function () {
+            var routeDiff = document.getElementById("difficulty_selector_filter").value;
+            var routeType = document.getElementById("route_selector_filter").value;
+
+            
         });
     });
 }
