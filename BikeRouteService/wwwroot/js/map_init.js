@@ -2,7 +2,9 @@
 
 function initMap() {
 
+    var allRoutesInfoGeoJson = ""
     var markers = new Map();
+
     var routeDifficultyColors = { 
         0 : 'green' , 
         1 : 'blue' ,
@@ -38,8 +40,6 @@ function initMap() {
         initializeMap();
     });
 
-    var allRoutesInfoGeoJson = ""
-
     function initializeMap() {
         $.get(routesApi + "GetAllRoutesInfo")
             .done(function (jsonResponse) {
@@ -48,7 +48,7 @@ function initMap() {
                 for (let i = 0; i < allRoutesInfoGeoJson.features.length; i++) {
                     const pointGeometry = allRoutesInfoGeoJson.features[i].geometry;
                     const pointProps = allRoutesInfoGeoJson.features[i].properties;
-                    createAllRoutesMarkers(pointGeometry, pointProps, i);
+                    createRouteMarker(pointGeometry, pointProps);
                 }
 
                 map.flyTo({
@@ -64,7 +64,7 @@ function initMap() {
             });
     }
 
-    function createAllRoutesMarkers(pointGeometry, pointProps) {
+    function createRouteMarker(pointGeometry, pointProps) {
         const popup = new mapboxgl.Popup({
             closeButton: false,
             closeOnClick: false,
@@ -179,6 +179,30 @@ function initMap() {
               });
         }
     }
+
+    function showFilteredRoutesList(routeDiffToShow, routeTypeToShow) {
+        clearAll();
+
+        for (let i = 0; i < allRoutesInfoGeoJson.features.length; i++) {
+            const pointGeometry = allRoutesInfoGeoJson.features[i].geometry;
+            const pointProps = allRoutesInfoGeoJson.features[i].properties;
+
+            if((pointProps.RouteType == routeTypeToShow || routeTypeToShow == -1) && 
+                    (pointProps.RouteDifficulty == routeDiffToShow || routeDiffToShow == -1))
+            {
+                createRouteMarker(pointGeometry, pointProps);
+            }
+        }
+
+        map.flyTo({
+            center: allRoutesInfoGeoJson.features[0].geometry.coordinates,
+            zoom: initialZoom
+        });
+
+        loadMarkersData();
+        showAllRoutesList();
+    }
+
     function downloadFile(routeName) {
         window.location.href = routesApi + "DownloadRouteFile?" + "routeName=" + routeName;
       }
@@ -245,7 +269,7 @@ function initMap() {
             var routeDiff = document.getElementById("difficulty_selector_filter").value;
             var routeType = document.getElementById("route_selector_filter").value;
 
-            
+            showFilteredRoutesList(routeDiff, routeType);
         });
     });
 }
