@@ -123,7 +123,7 @@ namespace BikeRouteService.Controllers
                     return StatusCode(StatusCodes.Status404NotFound, $"Route with name {routeName} not found");
                 }
 
-                var jsonRes = new JsonResult(GeoConverter.GetRouteGeoJson(routeObject));
+                var jsonRes = new JsonResult(GeoConverter.GetRouteObjectFromGeoJsonBytes(routeObject));
                 return jsonRes;
             }
             catch (Exception exception)
@@ -259,10 +259,11 @@ namespace BikeRouteService.Controllers
             switch (routeFile.GetFileExtension())
             {
                 case FileExtension.Gpx:
-                    route.OrigFileExtension = "gpx";
-                    route.OrigFileContent = routeFile.GetBytes();
                     try
                     {
+                        route.OrigFileExtension = "gpx";
+                        route.OrigFileContent = routeFile.GetBytes();
+
                         GeoConverter.ConvertGpxToGeoJson(routeFile.OpenReadStream(), route);
                     }
                     catch (Exception e)
@@ -271,24 +272,44 @@ namespace BikeRouteService.Controllers
                         throw new Exception("Cannot correctly read GPX file. Please check file is in correct format.");
                     }
                     break;
-                
-                //case FileExtension.GeoJson:
-                //    route.OrigFileExtension = "geojson";
-                //    route.OrigFileContent = routeFile.GetBytes();
-                //    route.GeoJsonFileContent = route.OrigFileContent;
-                //    GeoConverter.MapGeoJsonToRoute(route);
-                //    break;
-                
+
+                case FileExtension.GeoJson:
+                    try
+                    {
+                        route.OrigFileExtension = "geojson";
+                        route.OrigFileContent = routeFile.GetBytes();
+
+                        GeoConverter.MapGeoJsonToRoute(route);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogError(e.Message);
+                        throw new Exception("geojson format not supported yet.");
+                    }
+                    break;
+
                 //TODO: should we support this?
                 case FileExtension.Kml:
-                    route.OrigFileExtension = "kml";
-                    route.OrigFileContent = routeFile.GetBytes();
-                    route.GeoJsonFileContent = route.OrigFileContent;
-                    GeoConverter.MapKmlToRoute(route);
+                    try
+                    {
+                        route.OrigFileExtension = "kml";
+                        using (var ms = new System.IO.MemoryStream())
+                        {
+                            routeFile.CopyTo(ms);
+                            route.OrigFileContent = ms.ToArray();
+                        }
+
+                        GeoConverter.MapKmlToRoute(route);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogError(e.Message);
+                        throw new Exception("KML format not supported yet.");
+                    }
                     break;
                 
                 default:
-                    throw new Exception("Not supported file format");
+                    throw new Exception(routeFile.GetFileExtension() + " file format is not supported!");
             }
 
             route.ElevationGain = GeoConverter.CalculateElevationGainFromRouteGeoJson(route);

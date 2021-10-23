@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,10 @@ using Core.Common.SharedDataObjects;
 using GeoJSON.Net;
 using GeoJSON.Net.Feature;
 using GeoJSON.Net.Geometry;
+using Geolocation;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using SharpKml.Engine;
 
 namespace Core.Common.GpxUtils
 {
@@ -44,18 +48,45 @@ namespace Core.Common.GpxUtils
             }
         }
 
-        public static void MapKmlToRoute(Route routeToFill)
+        public static void MapGeoJsonToRoute(Route routeToFill)
         {
-            
-            string featureCollectionStr = ReadGeoJsonFromBytes(routeToFill.GeoJsonFileContent);
-            
+            string rawGeoJsonString = ConvertBytesToAsciiString(routeToFill.OrigFileContent);
             FeatureCollection featureCollectionObject =
-                JsonConvert.DeserializeObject<FeatureCollection>(featureCollectionStr);
+                JsonConvert.DeserializeObject<FeatureCollection>(rawGeoJsonString);
 
-            IGeometryObject geometryObject = featureCollectionObject.Features.Find(feature => feature.Geometry.Type == GeoJSONObjectType.LineString).Geometry;
+            IGeometryObject geometryObject = featureCollectionObject.Features
+                .Find(feature => feature.Geometry.Type == GeoJSONObjectType.LineString).Geometry;
+
+            if(geometryObject == null)
+            {
+                throw new Exception("GeoJson must contain LineString geometry. Currently only LineString is supported.");
+            }
 
             LineString line = (LineString)geometryObject;
-            var tt = 5;
+
+            routeToFill.ElevationGain = GetElevationForLineString(line);
+            routeToFill.RouteLength = GetLengthForLineString(line) / 1000;
+
+            routeToFill.StartLat = line.Coordinates.First().Latitude;
+            routeToFill.StartLng = line.Coordinates.First().Longitude;
+
+            routeToFill.EndLat = line.Coordinates.Last().Latitude;
+            routeToFill.EndLng = line.Coordinates.Last().Longitude;
+
+            routeToFill.MinAltitude = (double)line.Coordinates.Select(c => c.Altitude ?? 0).Min();
+            routeToFill.MaxAltitude = (double)line.Coordinates.Select(c => c.Altitude ?? 0).Max();
+
+            routeToFill.GeoJsonFileContent = routeToFill.OrigFileContent;
+        }
+
+        public static void MapKmlToRoute(Route routeToFill)
+        {
+            string kmlXmlString = ConvertBytesToAsciiString(routeToFill.OrigFileContent);
+
+            //SharpKml.Base.Parser parser = new SharpKml.Base.Parser();
+
+            //parser.ParseString(kmlXmlString, false);
+
             //routeToFill.RouteLength = (float)track.GetLength();
 
             //routeToFill.StartLat = positions.First().Latitude;
@@ -70,6 +101,7 @@ namespace Core.Common.GpxUtils
             //string gjString = CreateGeoJsonStringForGpxRoute(positions, routeToFill);
             //routeToFill.GeoJsonFileContent = Encoding.ASCII.GetBytes(gjString);
         }
+
         public static string GetAllRoutesInfoPointsGeoJson(List<Route> routes)
         {
             var geoFeatures = new List<Feature>();
@@ -93,15 +125,15 @@ namespace Core.Common.GpxUtils
             return featureCollectionJson;
         }
         
-        public static string GetRouteGeoJson(Route route)
+        public static string GetRouteObjectFromGeoJsonBytes(Route route)
         {
-            string featureCollectionStr = ReadGeoJsonFromBytes(route.GeoJsonFileContent);
+            string featureCollectionStr = ConvertBytesToAsciiString(route.GeoJsonFileContent);
             return featureCollectionStr;
         }
 
         public static double CalculateElevationGainFromRouteGeoJson(Route route)
         {
-            string featureCollectionStr = ReadGeoJsonFromBytes(route.GeoJsonFileContent);
+            string featureCollectionStr = ConvertBytesToAsciiString(route.GeoJsonFileContent);
             FeatureCollection featureCollectionObject =
                 JsonConvert.DeserializeObject<FeatureCollection>(featureCollectionStr);
 
@@ -109,6 +141,38 @@ namespace Core.Common.GpxUtils
 
             LineString line = (LineString) geometryObject;
 
+            return GetElevationForLineString(line);
+        }
+
+        private static double GetLengthForLineString(LineString line)
+        {
+            Coordinate origin;
+            Coordinate destination;
+
+            if(line.Coordinates.Count == 1)
+            {
+                return 0;
+            }
+            if (line.Coordinates.Count == 2)
+            {
+                origin = new Coordinate(line.Coordinates[0].Latitude, line.Coordinates[0].Longitude);
+                destination = new Coordinate(line.Coordinates[1].Latitude, line.Coordinates[1].Longitude);
+                return GeoCalculator.GetDistance(origin, destination, distanceUnit:DistanceUnit.Kilometers);
+            }
+
+            double length = 0;
+            for (int i = 1; i < line.Coordinates.Count; i++)
+            {
+                origin = new Coordinate(line.Coordinates[i-1].Latitude, line.Coordinates[i-1].Longitude);
+                destination = new Coordinate(line.Coordinates[i].Latitude, line.Coordinates[i].Longitude);
+                length += GeoCalculator.GetDistance(origin, destination, decimalPlaces: 1, distanceUnit: DistanceUnit.Meters);
+            }
+
+            return length;
+        }
+
+        private static double GetElevationForLineString(LineString line)
+        {
             if (line.Coordinates.Count <= 2)
             {
                 return 0;
@@ -123,13 +187,13 @@ namespace Core.Common.GpxUtils
                     elevation += gain;
                 }
             }
-            
+
             return elevation;
         }
-        
-        private static string ReadGeoJsonFromBytes(byte[] gsBytes)
+
+        private static string ConvertBytesToAsciiString(byte[] bytesArray)
         {
-            return Encoding.ASCII.GetString(gsBytes, 0, gsBytes.Length);
+            return Encoding.ASCII.GetString(bytesArray, 0, bytesArray.Length);
         }
         
         private static string CreateGeoJsonStringForGpxRoute(List<Position> coordinates, Route route)
