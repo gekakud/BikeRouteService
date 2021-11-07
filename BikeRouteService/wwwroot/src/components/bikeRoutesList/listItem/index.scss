@@ -1,0 +1,30 @@
+.list-item {
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  padding: 30px 20px 10px;
+
+  &:hover {
+    border-color: #2F3B59;
+  }
+
+  &__short-desc {
+    font-size: 12px;
+    color: #666;
+  }
+
+  &__info {
+    font-weight: 500;
+    border-top: 1px solid #eee;
+
+    span { 
+      color: #999;
+      font-size: 13px;
+    }
+  }
+
+  h3 {
+    cursor: pointer;
+    display: inline-block;
+  }
+}

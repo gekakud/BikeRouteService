@@ -1,0 +1,16 @@
+.mapboxgl-popup-content {
+  border-radius: 6px;
+  min-width: 310px;
+  padding: 0;
+  overflow: hidden;
+
+  h3 {
+    border-bottom: 1px solid #eee;
+    background-color: #2F3B59;
+    color: #eee;
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+}

@@ -1,0 +1,13 @@
+.customDropdown {
+  .dropdown-toggle {
+    &::after {
+      margin-left: 0.5em;
+    }
+  }
+}
+
+.w-100.btn {
+  & + .dropdown-menu {
+    width: 100%;
+  }
+}

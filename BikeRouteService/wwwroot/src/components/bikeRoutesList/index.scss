@@ -1,0 +1,15 @@
+.feature-listing {
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+    background-color: #eee;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #2F3B59;
+    width: 10px;
+    border-radius: 10px;
+  }
+}

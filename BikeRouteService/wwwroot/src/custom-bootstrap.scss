@@ -1,0 +1,18 @@
+/* The following block can be included in a custom.scss */
+
+/* make the customizations */
+$theme-colors: (
+    "primary": #2F3B59,
+    "secondary":#4DB7FE,
+    // "primary": #4DB7FE,
+    "info": tomato,
+    "danger": teal
+);
+
+/* import bootstrap to set changes */
+@import "~bootstrap/scss/bootstrap";
+
+
+.modal-backdrop.show {
+    opacity: 0.75;
+}
