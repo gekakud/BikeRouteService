@@ -10,6 +10,7 @@ import { instance } from './api/api';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Col, Container, Row, Spinner } from 'react-bootstrap';
+import FiltersToggler from './components/routesFilter/filtersToggler/FiltersToggler';
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
   const [freeViewportHeight, setFreeViewportHeight] = useState( (window.innerHeight - 80) )
   const [selectedRouteListItem, setSelectedRouteListItem] = useState(null)
   const [routesLoading, setRoutesLoading] = useState(false)
+  const [isFiltersOpen, setIsFiltersOpen] = useState(true)
 
   const routesListRef = useRef(null)
   const filtersRef = useRef(null)
@@ -65,7 +67,11 @@ function App() {
     [],
   )
 
+  useEffect(() => {
+      setRefreshMap(true)
+  }, [isFiltersOpen])
 
+  // window resize map sizes handler 
   useEffect(() => {
 
     const handleWindowResize = () => {
@@ -74,6 +80,8 @@ function App() {
       if (currentFreeVieportHeight !== freeViewportHeight) {
         setFreeViewportHeight(currentFreeVieportHeight)
       }
+
+      setRefreshMap(true)
     }
 
     window.addEventListener('resize', handleWindowResize)
@@ -83,6 +91,7 @@ function App() {
   }, [])
 
 
+  // initial request for get routes
   useEffect(() => {
     if (!routes) {
       setRoutesLoading(true)
@@ -115,7 +124,7 @@ function App() {
           <Header uploadModalToggler={toggleUploadModal} />
         </Row>
         <Row className="content-main align-items-start">
-          <Col xs={6} xl={5} style={{maxHeight: `${freeViewportHeight}px`, overflow: 'hidden', }}>
+          <Col xs={6} xl={5} className={isFiltersOpen ? null : 'd-none'} style={{maxHeight: `${freeViewportHeight}px`, overflow: 'hidden', }}>
             <RoutesFilter  
               routesListRef={routesListRef} 
               handleRefreshMap={handleRefreshMap}
@@ -138,7 +147,7 @@ function App() {
               </Row>
             }
           </Col>
-          <Col xs={6} xl={7} style={{position: 'relative'}} className="gx-0">
+          <Col xs={isFiltersOpen ? 6 : 12} xl={isFiltersOpen ? 7 : 12} style={{position: 'relative'}} className="gx-0">
             <Row className="gx-0">
               <Col xs={12}>
                 <Map
@@ -147,9 +156,11 @@ function App() {
                     routesListRef={routesListRef} 
                     handleRefreshMap={handleRefreshMap}
                     refreshMap={refreshMap}
+                    setRefreshMap={setRefreshMap}
                     selectedRouteListItem={selectedRouteListItem}
                     setRoutes={setRoutes}
                 />
+                <FiltersToggler setIsFiltersOpen={setIsFiltersOpen} isFiltersOpen={isFiltersOpen} />
               </Col>
             </Row>
               

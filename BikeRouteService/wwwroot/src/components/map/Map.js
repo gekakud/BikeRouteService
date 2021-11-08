@@ -37,7 +37,7 @@ const ICON = `M192 0C85.97 0 0 85.97 0 192c0 77.41 26.97 99.03 172.3 309.7c9.531
     stroke: 'none'
   };
 
-const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight }) => {
+const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, setRefreshMap }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const markers = useRef([]);
@@ -101,12 +101,31 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight }
     [],
   )
 
-
   useEffect(() => {
-    setViewport(prev => {
-      return {...prev, height: `${freeMapViewportHeight}px`}
-    })
-  }, [freeMapViewportHeight])
+
+    if (refreshMap) {
+      setViewport(prev => {
+        return {
+          ...prev,
+          width: "100%",
+          height: `${freeMapViewportHeight}px`,
+        }
+      })
+
+      setRefreshMap(false)
+    }
+
+  }, [refreshMap, freeMapViewportHeight, setRefreshMap])
+
+  // useEffect(() => {
+  //   setViewport(prev => {
+  //     return {
+  //       ...prev,
+  //       width: '100%',
+  //       height: `${freeMapViewportHeight}px`
+  //     }
+  //   })
+  // }, [freeMapViewportHeight])
 
 
   function clearRouteLayer() {
