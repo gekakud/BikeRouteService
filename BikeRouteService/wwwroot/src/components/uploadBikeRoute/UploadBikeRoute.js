@@ -78,7 +78,7 @@ const UploadBikeRoute = ({show, uploadModalToggler, handleRefreshMap}) => {
               value={routeName} 
             />
           </Form.Group>
-          <Row>
+          <Row className="mb-3">
             <Form.Group as={Col} controlId="formGridDiff">
               <Form.Label>Route Difficulty</Form.Label>
               <Form.Select 
@@ -123,7 +123,7 @@ const UploadBikeRoute = ({show, uploadModalToggler, handleRefreshMap}) => {
 
           </Form.Group>
     
-          <Button variant="primary" type="submit">
+          <Button className="w-100" variant="primary" type="submit" size="lg">
             Upload
           </Button>
         </Form>

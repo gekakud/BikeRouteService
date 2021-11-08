@@ -5,9 +5,19 @@ import Tooltip from './tooltip/Tooltip'
 import { toast } from 'react-toastify'
 // import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import { Spinner } from 'react-bootstrap';
-import ReactMapGL, { Marker, NavigationControl, Popup } from 'react-map-gl';
+import ReactMapGL, { 
+  Marker,
+  NavigationControl,
+  Popup,
+  FlyToInterpolator,
+  LinearInterpolator,
+  Layer,
+  Source,
+  WebMercatorViewport,
+} from 'react-map-gl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationArrow } from '@fortawesome/free-solid-svg-icons';
+import bbox from '@turf/bbox';
 // mapboxgl.accessToken = 'pk.eyJ1IjoiZ2VrYXBlayIsImEiOiJja3J3MDc5aDUwYnVtMnZuODI3bnN4bWo4In0.Y7ifVj3T99VpyiLNuLEVnQ';
 
 
@@ -25,28 +35,46 @@ const routeTypeColors = {
   3 : 'orange' , 
 };
 
-// const ICON = `M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,4.5,2,10c0,2,0.6,3.9,1.6,5.4c0,0.1,0.1,0.2,0.2,0.3
-//   c0,0,0.1,0.1,0.1,0.2c0.2,0.3,0.4,0.6,0.7,0.9c2.6,3.1,7.4,7.6,7.4,7.6s4.8-4.5,7.4-7.5c0.2-0.3,0.5-0.6,0.7-0.9
-//   C20.1,15.8,20.2,15.8,20.2,15.7z`;
+const routeLayer = {
+  'id': 'route-layer',
+  'type': 'line',
+  'source': 'route',
+  'layout': {
+      'line-join': 'round',
+      'line-cap': 'round'
+  },
+  'paint': {
+      'line-color': 'green',
+      'line-width': 5
+  }
+}
 
 const ICON = `M192 0C85.97 0 0 85.97 0 192c0 77.41 26.97 99.03 172.3 309.7c9.531 13.77 29.91 13.77 39.44 0C357 291 384 269.4 384 192C384 85.97 298 0 192 0zM192 271.1c-44.13 0-80-35.88-80-80S147.9 111.1 192 111.1s80 35.88 80 80S236.1 271.1 192 271.1z`;
-
-  const pinStyle = {
-    cursor: 'pointer',
-    // fill: '#d00',
-    stroke: 'none'
-  };
+const pinStyle = {
+  cursor: 'pointer',
+  // fill: '#d00',
+  stroke: 'none'
+};
 
 const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, setRefreshMap }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const markers = useRef([]);
+  const [layerOptions, setLayerOptions] = useState({
+    'id': 'route-layer',
+    'type': 'line',
+    // 'source': 'route',
+    'layout': {
+        'line-join': 'round',
+        'line-cap': 'round'
+    },
+    'paint': {
+        'line-color': 'green',
+        'line-width': 5
+    }
+  })
 
   const [size, setSize] = useState(38)
-
-  const [lng, setLng] = useState(35.374668);
-  const [lat, setLat] = useState(32.796048);
-  const [zoom, setZoom] = useState(8);
   const [loading, setLoading] = useState(false)
 
   const [viewport, setViewport] = useState({
@@ -56,32 +84,103 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
     width: "100%",
     height: `${freeMapViewportHeight}px`,
     transitionDuration: 800,
+    transitionInterpolator: new LinearInterpolator(),
+    // transitionInterpolator: new FlyToInterpolator(),
   });
 
   const [selectedRoute, setSelectedRoute] = useState(null)
-
-  // const tooltipRef = useRef(new mapboxgl.Popup({
-  //   closeButton: false,
-  //   closeOnClick: false,
-  //   offset: 25
-  // }));
-
+  const [selectedLayer, setSelectedLayer] = useState(null)
 
   const handleMarkerClick = useCallback(
     (route) => {
-      setViewport(prevView => {
+      // setSelectedRoute(route)
+
+      setViewport(prev => {
         return {
-          ...prevView, 
-          latitude: route.geometry.coordinates[1],
-          longitude: route.geometry.coordinates[0],
-          zoom: 15,
+          ...prev, 
+          transitionInterpolator: new FlyToInterpolator()
         }
       })
 
-      setTimeout(() => {
-        setSelectedRoute(route)
-      }, 300)
-      
+      instance.get('GetRouteGeoJsonByName', {
+        params: {
+          routeName: route.properties.RouteName
+        }
+      })
+      .then(response => {
+        if (response.status === 200) {
+          const data = JSON.parse(response.data)
+
+          console.log(`data`, data)
+
+          setLayerOptions(prev => {
+            return {
+              ...prev, 
+              paint : {
+                ...prev.paint, 
+                'line-color': routeDifficultyColors[route.properties.RouteDifficulty]
+              }
+            }
+          })
+
+          // layerRef.current.paint['line-color'] = routeDifficultyColors[route.properties.RouteDifficulty]
+
+          setSelectedLayer(data)
+
+          const { coordinates } = data.features[0].geometry
+
+          const bounds = bbox(data)
+
+          console.log(`bounds`, bounds)
+
+          const mapCanvas = map.current.getMap()._canvas
+
+          console.log(`mapCanvas`, mapCanvas)
+
+          console.log(`viewport`, viewport)
+          console.log(`map.current.getMap()`, map.current.getMap())
+          console.log(`map.current.getMap().getStyle()`, map.current.getMap().getStyle())
+          // console.log(`map.current.queryRenderedFeatures()`, map.current.queryRenderedFeatures())
+
+          const routeViewport = new WebMercatorViewport({
+            width: mapCanvas.clientWidth,
+            height: mapCanvas.clientHeight,
+          })
+          
+          console.log(`routeViewport`, routeViewport)
+
+          const t = routeViewport.fitBounds(
+            [ 
+              [bounds[0], bounds[1]],
+              [bounds[2], bounds[3]],
+            ],
+            {
+              padding: 45,
+            }
+          )
+
+          console.log(`t`, t)
+
+          setViewport(prevView => {
+            return {
+              ...prevView, 
+              // latitude: route.geometry.coordinates[1],
+              // longitude: route.geometry.coordinates[0],
+              // zoom: 15,
+              ...t,
+              transitionInterpolator: new LinearInterpolator()
+            }
+          })
+    
+          setTimeout(() => {
+            setSelectedRoute(route)
+          }, 300)
+
+        }
+      })
+      .catch(e => {
+        toast.error(e.message)
+      })
 
     },
     [],
@@ -97,6 +196,20 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
     () => {
       console.log(`event leave`)
       setSelectedRoute(null)
+    },
+    [],
+  )
+
+  const handleViewportChange = useCallback(
+    (viewport) => {
+      setViewport(viewport)
+    },
+    [],
+  )
+  
+  const handleZoomChange = useCallback(
+    (interactionState) => {
+      console.log(`interactionState`, interactionState)
     },
     [],
   )
@@ -117,58 +230,30 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
 
   }, [refreshMap, freeMapViewportHeight, setRefreshMap])
 
-  // useEffect(() => {
-  //   setViewport(prev => {
-  //     return {
-  //       ...prev,
-  //       width: '100%',
-  //       height: `${freeMapViewportHeight}px`
-  //     }
-  //   })
-  // }, [freeMapViewportHeight])
-
-
-  function clearRouteLayer() {
-    const all_layers = [];
-
-    if (!map.current) return null
-
-    for (let j = 0; j < map.current.getStyle().layers.length; j++) {
-        all_layers.push(map.current.getStyle().layers[j].id)
-    }
-
-    if (all_layers.includes("route-layer")) {
-        map.current.removeLayer("route-layer");
-        map.current.removeSource("route");
-    }
-  }
-
-  const handleClearMap = useCallback(() => {
-    if(markers.current.length) {
-      markers.current.forEach(marker => {
-        marker.remove()
-      })
-
-      markers.current.length = 0
-
-      // clearRouteLayer
-      // clearAllRoutesList -> doesnt need
-    }
-  }, []);
-
-
   // zoomMapToRoute
   useEffect(() => {
     
     if (selectedRouteListItem) {
-      setViewport(prevViewport => {
+      setViewport(prev => {
         return {
-          ...prevViewport, 
-          latitude: selectedRouteListItem.geometry.coordinates[1],
-          longitude: selectedRouteListItem.geometry.coordinates[0],
-          zoom: 15,
+          ...prev,
+          transitionInterpolator: new FlyToInterpolator()
         }
       })
+
+      setTimeout(() => {
+        setViewport(prevViewport => {
+          return {
+            ...prevViewport, 
+            latitude: selectedRouteListItem.geometry.coordinates[1],
+            longitude: selectedRouteListItem.geometry.coordinates[0],
+            zoom: 15,
+            transitionInterpolator: new LinearInterpolator()
+  
+          }
+        })
+      }, 0)
+      
     }
 
   }, [selectedRouteListItem])
@@ -179,7 +264,11 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
         mapboxApiAccessToken={`pk.eyJ1IjoiZ2VrYXBlayIsImEiOiJja3J3MDc5aDUwYnVtMnZuODI3bnN4bWo4In0.Y7ifVj3T99VpyiLNuLEVnQ`}
         {...viewport}
         mapStyle={`mapbox://styles/mapbox/streets-v11`}
-        onViewportChange={(viewport) => setViewport(viewport)}
+        onViewportChange={handleViewportChange}
+        onInteractionStateChange={handleZoomChange}
+        // transitionDuration={800}
+        // transitionInterpolator={new FlyToInterpolator()}
+        ref={map}
       >
         <NavigationControl style={{right: 10, top: 10}} />
 
@@ -225,9 +314,16 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
           </Popup>
         }
         
+        {
+          selectedLayer && <Source id="route" type="geojson" data={selectedLayer}>
+            <Layer 
+            {...layerOptions }
+          />
+          </Source>
+        }
           
       </ReactMapGL>
-      { loading && <Spinner animation="border" variant="primary" style={{position: 'absolute', left: '50%', top: '50%'}} /> }
+      {/* { loading && <Spinner animation="border" variant="primary" style={{position: 'absolute', left: '50%', top: '50%'}} /> } */}
     </>
   )
 }

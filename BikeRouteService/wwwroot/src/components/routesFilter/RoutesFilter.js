@@ -81,7 +81,7 @@ const RoutesFilter = ({onFilter, filtersRef, setRoutes, setRoutesLoading}) => {
       <Row className="mb-3">
 
 
-      <Form.Group as={Col} controlId="formGridDiff">
+      <Form.Group as={Col} controlId="routeDiff">
         <Form.Label>Route Difficulty</Form.Label>
         <Form.Select 
           defaultValue="Begginer" 
@@ -97,7 +97,7 @@ const RoutesFilter = ({onFilter, filtersRef, setRoutes, setRoutesLoading}) => {
           <option>Beast</option>
         </Form.Select>
       </Form.Group>
-      <Form.Group as={Col} controlId="formGridType">
+      <Form.Group as={Col} controlId="routeType">
         <Form.Label>Route Type</Form.Label>
         <Form.Select 
           defaultValue="Mixed" 
@@ -116,7 +116,7 @@ const RoutesFilter = ({onFilter, filtersRef, setRoutes, setRoutesLoading}) => {
 
       </Row>
 
-      <Row>
+      <Row className="">
         <Col xs={12}>
           <Button className="w-100" size={`lg`} onClick={handleFilterSubmit}>
             Filter
