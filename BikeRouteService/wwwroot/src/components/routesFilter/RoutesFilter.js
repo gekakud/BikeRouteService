@@ -4,10 +4,10 @@ import { toast } from 'react-toastify'
 import { instance } from '../../api/api'
 import styles from './index.scss'
 
-const RoutesFilter = ({onFilter, filtersRef, setRoutes, setRoutesLoading}) => {
+const RoutesFilter = ({onFilter, filtersRef, setFilteredRoutes, setRoutes, setRoutesLoading}) => {
 
-  const [routeDiff, setRouteDiff] = useState('All')
-  const [routeType, setRouteType] = useState('All')
+  const [routeDiff, setRouteDiff] = useState('-1')
+  const [routeType, setRouteType] = useState('-1')
 
   const handleRouteType = useCallback(
     (e) => {
@@ -38,8 +38,8 @@ const RoutesFilter = ({onFilter, filtersRef, setRoutes, setRoutesLoading}) => {
   )
 
   const handleClearMap = useCallback(() => {
-    setRoutes(null)
-  }, [setRoutes])
+    setFilteredRoutes(null)
+  }, [setFilteredRoutes])
 
   const handleShowAll = useCallback(() => {
     setRoutesLoading(true)
@@ -57,11 +57,10 @@ const RoutesFilter = ({onFilter, filtersRef, setRoutes, setRoutesLoading}) => {
       })
       .catch( err => {
         toast.error(err.message)
-        const json = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[35.221484,32.763777]},\"properties\":{\"RouteName\":\"Alon\",\"RouteType\":3,\"RouteDifficulty\":3,\"RouteLength\":10.03973388671875,\"ElevationGain\":216.00000000000003}},{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[35.374668,32.796048]},\"properties\":{\"RouteName\":\"Turan\",\"RouteType\":3,\"RouteDifficulty\":1,\"RouteLength\":18.14175033569336,\"ElevationGain\":492.10000000000025}},{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[35.157723,33.063706]},\"properties\":{\"RouteName\":\"mezuba\",\"RouteType\":2,\"RouteDifficulty\":2,\"RouteLength\":11.60865306854248,\"ElevationGain\":278.6000000000001}},{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[34.959657,32.651168]},\"properties\":{\"RouteName\":\"shluha\",\"RouteType\":0,\"RouteDifficulty\":1,\"RouteLength\":21.178760528564453,\"ElevationGain\":811.0000000000026}}]}";
-        setRoutes(JSON.parse(json).features)
         setRoutesLoading(false)
       })
   }, [setRoutes,setRoutesLoading])
+
 
   return (
     <Container fluid ref={filtersRef} className={`py-4`}>
@@ -84,33 +83,31 @@ const RoutesFilter = ({onFilter, filtersRef, setRoutes, setRoutesLoading}) => {
       <Form.Group as={Col} controlId="routeDiff">
         <Form.Label>Route Difficulty</Form.Label>
         <Form.Select 
-          defaultValue="Begginer" 
           name="routeDiff" 
           required 
           value={routeDiff}
           onChange={handleRouteDiff}  
         >
-          <option>All</option>
-          <option>Begginer</option>
-          <option>Intermediate</option>
-          <option>Proficient</option>
-          <option>Beast</option>
+          <option value="-1">All</option>
+          <option value="0">Begginer</option>
+          <option value="1">Intermediate</option>
+          <option value="2">Proficient</option>
+          <option value="3">Beast</option>
         </Form.Select>
       </Form.Group>
       <Form.Group as={Col} controlId="routeType">
         <Form.Label>Route Type</Form.Label>
         <Form.Select 
-          defaultValue="Mixed" 
           name="routeType" 
           required 
           value={routeType}
           onChange={handleRouteType}  
         >
-          <option>All</option>
-          <option>Mtb</option>
-          <option>Gravel</option>
-          <option>Road</option>
-          <option>Mixed</option>
+          <option value="-1">All</option>
+          <option value="0">Mtb</option>
+          <option value="1">Gravel</option>
+          <option value="2">Road</option>
+          <option value="3">Mixed</option>
         </Form.Select>
       </Form.Group>
 

@@ -15,6 +15,7 @@ import FiltersToggler from './components/routesFilter/filtersToggler/FiltersTogg
 function App() {
 
   const [routes, setRoutes] = useState(null)
+  const [filteredRoutes, setFilteredRoutes] = useState(null)
   const [currentRoute, setCurrentRoute] = useState(null)
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
   const [refreshMap, setRefreshMap] = useState(false)
@@ -39,32 +40,64 @@ function App() {
 
   const onFilter = useCallback(
     ({routeType, routeDiff}) => {
-      setRoutes(null)
+      // setRoutes(null)
+      setFilteredRoutes(null)
       setRoutesLoading(true)
 
-      instance.get('GetRoute', {
-        params: {
-          routeType,
-          routeDiff
-        }
-      })
-      .then( response => {
-        console.log(`response`, response)
-        if (response.status === 200) {
-          const data = JSON.parse(response.data)
+      console.log(`routeType, routeDiff`, routeType, routeDiff)
 
-          if (data.type === "FeatureCollection"){
-            setRoutes(data.features)
-            setRoutesLoading(false)
-          }
-        }
+
+
+      const filtered = routes.filter(route => {
+        const {RouteType, RouteDifficulty} = route.properties
+        return ( (RouteType == routeType || routeType == '-1'  ) && ( RouteDifficulty == routeDiff || routeDiff == '-1') )
       })
-      .catch( err => {
-        toast.error(err.message)
-        setRoutesLoading(false)
-      })
+
+      setFilteredRoutes(filtered)
+      setRoutesLoading(false)
+
+      // instance.get('GetRoute', {
+      //   params: {
+      //     routeType,
+      //     routeDiff
+      //   }
+      // })
+      // .then( response => {
+      //   console.log(`response`, response)
+      //   if (response.status === 200) {
+      //     const data = JSON.parse(response.data)
+
+      //     if (data.type === "FeatureCollection"){
+      //       setRoutes(data.features)
+      //       setRoutesLoading(false)
+      //     }
+      //   }
+      // })
+      // .catch( err => {
+      //   toast.error(err.message)
+      //   setRoutesLoading(false)
+      // })
     },
-    [],
+    [routes],
+  )
+
+  const onSearch = useCallback(
+    (search) => {
+      setFilteredRoutes(null)
+      setRoutesLoading(true)
+
+      if(search) {
+        const filtered = routes.filter(route => {
+          const {RouteName} = route.properties
+          return ( RouteName.toLowerCase().trim() === search.toLowerCase().trim() )
+        })
+
+        setFilteredRoutes(filtered)
+      }
+
+      setRoutesLoading(false)
+    },
+    [routes]
   )
 
   useEffect(() => {
@@ -90,6 +123,11 @@ function App() {
     }
   }, [])
 
+  // Sync filtered routes state with general routes state
+  useEffect(() => {
+    setFilteredRoutes(routes)
+  }, [routes])
+
 
   // initial request for get routes
   useEffect(() => {
@@ -103,14 +141,13 @@ function App() {
 
           if (data.type === "FeatureCollection"){
             setRoutes(data.features)
+            setFilteredRoutes(data.features)
             setRoutesLoading(false)
           }
         }
       })
       .catch( err => {
         toast.error(err.message)
-        const json = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[35.221484,32.763777]},\"properties\":{\"RouteName\":\"Alon\",\"RouteType\":3,\"RouteDifficulty\":3,\"RouteLength\":10.03973388671875,\"ElevationGain\":216.00000000000003}},{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[35.374668,32.796048]},\"properties\":{\"RouteName\":\"Turan\",\"RouteType\":3,\"RouteDifficulty\":1,\"RouteLength\":18.14175033569336,\"ElevationGain\":492.10000000000025}},{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[35.157723,33.063706]},\"properties\":{\"RouteName\":\"mezuba\",\"RouteType\":2,\"RouteDifficulty\":2,\"RouteLength\":11.60865306854248,\"ElevationGain\":278.6000000000001}},{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[34.959657,32.651168]},\"properties\":{\"RouteName\":\"shluha\",\"RouteType\":0,\"RouteDifficulty\":1,\"RouteLength\":21.178760528564453,\"ElevationGain\":811.0000000000026}}]}";
-        setRoutes(JSON.parse(json).features)
         setRoutesLoading(false)
       })
     }
@@ -121,7 +158,7 @@ function App() {
     <>
       <Container fluid>
         <Row>
-          <Header uploadModalToggler={toggleUploadModal} />
+          <Header uploadModalToggler={toggleUploadModal} onSearch={onSearch} />
         </Row>
         <Row className="content-main align-items-start">
           <Col xs={6} xl={5} className={isFiltersOpen ? null : 'd-none'} style={{maxHeight: `${freeViewportHeight}px`, overflow: 'hidden', }}>
@@ -130,11 +167,12 @@ function App() {
               handleRefreshMap={handleRefreshMap}
               filtersRef={filtersRef}
               setRoutes={setRoutes}
+              // setFilteredRoutes={setFilteredRoutes}
               setRoutesLoading={setRoutesLoading}
               onFilter={onFilter}
             />
-            { routes && <BikeRoutesList 
-                routes={routes} 
+            { filteredRoutes && <BikeRoutesList 
+                routes={filteredRoutes} 
                 routesListRef={routesListRef} 
                 handleRefreshMap={handleRefreshMap}
                 freeListViewportHeight={freeViewportHeight - 20 - filtersRef?.current?.clientHeight}
@@ -152,7 +190,7 @@ function App() {
               <Col xs={12}>
                 <Map
                     freeMapViewportHeight={freeViewportHeight}
-                    routes={routes} 
+                    routes={filteredRoutes}
                     routesListRef={routesListRef} 
                     handleRefreshMap={handleRefreshMap}
                     refreshMap={refreshMap}

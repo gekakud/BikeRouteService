@@ -1,15 +1,31 @@
 import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import styles from './Header.module.scss'
 
-const Header = ({uploadModalToggler}) => {
+const Header = ({uploadModalToggler, onSearch}) => {
 
   const handleAddRoute = useCallback((e)=>{
     e.preventDefault()
     
     uploadModalToggler()
   }, [uploadModalToggler])
+
+  const [search, setSearch] = useState('')
+
+  const handleSearchInput = useCallback(
+    (e) => {
+      setSearch(e.target.value)
+    }, 
+    []
+  )
+  const handleSearch = useCallback(
+    (e) => {
+      e.preventDefault()
+      onSearch && onSearch(search)
+    }, 
+    [onSearch, search]
+  )
 
 
   return (
@@ -19,10 +35,13 @@ const Header = ({uploadModalToggler}) => {
                 <a href="index.html"><img src="images/logo.png" alt="" /></a>
             </div>
             <div className={`${styles.headerSearch} ${styles.visHeaderSearch}`}>
+              <form onSubmit={handleSearch} >
                 <div className={`${styles.headerSearchInputItem}`}>
-                    <input type="text" placeholder="Keywords" value=""/>
+                    <input type="text" placeholder="Keywords" value={search}  onChange={handleSearchInput}/>
                 </div>
-                <button className={`${styles.headerSearchButton}`} onClick="window.location.href='listing.html'">Search</button>
+                <button type="submit" className={`${styles.headerSearchButton}`}>Search</button>
+              </form>
+                
             </div>
             <div className={`${styles.showSearchButton}`}>
               <FontAwesomeIcon icon={faSearch} />
