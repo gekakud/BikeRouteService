@@ -1,15 +1,36 @@
 .feature-listing {
   overflow: auto;
+  margin-top: 30px;
 
   &::-webkit-scrollbar {
     width: 10px;
     border-radius: 10px;
     background-color: #eee;
   }
+  &
 
   &::-webkit-scrollbar-thumb {
     background: #2F3B59;
     width: 10px;
     border-radius: 10px;
+  }
+}
+
+html {
+  &[dir="rtl"] {
+    .feature-listing {
+      direction: ltr;
+
+      & > .row {
+        direction: rtl;
+
+
+        .list-item {
+          .btn {
+            float: left !important;
+          }
+        }
+      }
+    }
   }
 }

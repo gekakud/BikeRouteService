@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect, useRef } from "react"
 import { Modal, Form, Row, Col, Button } from "react-bootstrap"
+import { useTranslation } from "react-i18next"
 import { toast } from "react-toastify"
 import { instance } from "../../api/api"
 
@@ -11,6 +12,8 @@ const UploadBikeRoute = ({show, uploadModalToggler, handleRefreshMap}) => {
   const [routeName, setRouteName] = useState('')
   const [routeDiff, setRouteDiff] = useState('Beginner')
   const [routeType, setRouteType] = useState('Mixed')
+
+  const { t } = useTranslation()
 
   const handleClose = useCallback(() => {
     uploadModalToggler(false)
@@ -66,57 +69,56 @@ const UploadBikeRoute = ({show, uploadModalToggler, handleRefreshMap}) => {
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title>Want to add a bike route?</Modal.Title>
+        <Modal.Title>{ t('uploadFormTitle') }</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
         <Form onSubmit={handleUpload} ref={formRef}>
           <Form.Group as={Col} className="mb-3"controlId="formRouteName">
-            <Form.Label>Route Name</Form.Label>
-            <Form.Control placeholder="Route Name" name="routeName" required 
+            <Form.Label>{ t('routeName') }</Form.Label>
+            <Form.Control placeholder={ t('routeName') } name="routeName" required 
               onChange={e => setRouteName(e.currentTarget.value)}
               value={routeName} 
             />
           </Form.Group>
           <Row className="mb-3">
-            <Form.Group as={Col} controlId="formGridDiff">
-              <Form.Label>Route Difficulty</Form.Label>
+            <Form.Group as={Col} controlId="routeDiff">
+              <Form.Label>{ t('filters.diffSelectLabel') }</Form.Label>
               <Form.Select 
-                defaultValue="Begginer" 
                 name="routeDiff" 
                 required 
                 onChange={e => setRouteDiff(e.currentTarget.value)}
                 value={routeDiff} 
               >
 
-                <option>Begginer</option>
-                <option>Intermediate</option>
-                <option>Proficient</option>
-                <option>Beast</option>
+                <option value="Beginner">     { t('filters.diffSelect.key_1') } </option>
+                <option value="Intermediate"> { t('filters.diffSelect.key_2') } </option>
+                <option value="Proficient">   { t('filters.diffSelect.key_3') } </option>
+                <option value="Beast">        { t('filters.diffSelect.key_4') } </option>
               </Form.Select>
             </Form.Group>
-            <Form.Group as={Col} controlId="formGridType">
-              <Form.Label>Route Type</Form.Label>
+            <Form.Group as={Col} controlId="routeType">
+              <Form.Label>{ t('filters.typeSelectLabel') }</Form.Label>
               <Form.Select 
-                defaultValue="Mixed" 
                 name="routeType" 
                 required 
                 onChange={e => setRouteType(e.currentTarget.value)}
                 value={routeType}
               >
-                <option>Mtb</option>
-                <option>Gravel</option>
-                <option>Road</option>
-                <option>Mixed</option>
+                <option value="Mtb">    { t('filters.typeSelect.key_1') } </option>
+                <option value="Gravel"> { t('filters.typeSelect.key_2') } </option>
+                <option value="Road">   { t('filters.typeSelect.key_3') } </option>
+                <option value="Mixed">  { t('filters.typeSelect.key_4') } </option>
               </Form.Select>
             </Form.Group>
           </Row>
           <Form.Group className="position-relative mb-3">
-            <Form.Label>File</Form.Label>
+            <Form.Label> { t('file') } </Form.Label>
             <Form.Control
               type="file"
               required
               name="file"
+              accept=".gpx, .geojson, .kml"
               // onChange={handleChange}
               // isInvalid={!!errors.file}
             />
@@ -124,7 +126,7 @@ const UploadBikeRoute = ({show, uploadModalToggler, handleRefreshMap}) => {
           </Form.Group>
     
           <Button className="w-100" variant="primary" type="submit" size="lg">
-            Upload
+            { t('uploadBtn') }
           </Button>
         </Form>
       </Modal.Body>

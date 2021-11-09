@@ -1,0 +1,31 @@
+{
+  "routeName": "Route Name",
+  "search": "Search",
+  "addRoute": "Add Bike Route",
+  "filters": {
+    "showAllBtn": "Show all routes",
+    "clearMapBtn": "Clear Map",
+    "diffSelectLabel": "Route Difficulty",
+    "diffSelect": {
+      "key_0": "All",
+      "key_1": "Beginner",
+      "key_2": "Intermediate",
+      "key_3": "Proficient",
+      "key_4": "Beast"
+    },
+    "typeSelectLabel": "Route Type",
+    "typeSelect": {
+      "key_0": "All",
+      "key_1": "Mtb",
+      "key_2": "Gravel",
+      "key_3": "Road",
+      "key_4": "Mixed"
+    },
+    "filterBtn": "Filter"
+  },
+  "elevation": "meters",
+  "distance": "km" ,
+  "uploadFormTitle": "Want to add a bike route?",
+  "uploadBtn": "Upload",
+  "file": "File"
+}

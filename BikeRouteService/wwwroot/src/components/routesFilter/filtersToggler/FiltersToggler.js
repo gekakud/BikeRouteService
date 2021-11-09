@@ -1,6 +1,7 @@
-import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
+// import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
+import { Button } from 'react-bootstrap';
 import styles from './index.module.scss';
 
 const FiltersToggler = ({setIsFiltersOpen, isFiltersOpen}) => {  
@@ -8,14 +9,14 @@ const FiltersToggler = ({setIsFiltersOpen, isFiltersOpen}) => {
     () => {
       setIsFiltersOpen(isOpen => !isOpen)
     },
-    [],
+    [setIsFiltersOpen],
   )
 
   return (
-    <div className={styles.toggler} onClick={handleToggle}>
-      { isFiltersOpen && <FontAwesomeIcon icon={faArrowLeft}  /> }
-      { !isFiltersOpen && <FontAwesomeIcon icon={faArrowRight}  /> }
-    </div>
+    <Button className={styles.toggler} onClick={handleToggle}>
+      { isFiltersOpen && <FontAwesomeIcon icon='arrow-left'  /> }
+      { !isFiltersOpen && <FontAwesomeIcon icon='arrow-right'  /> }
+    </Button>
   )
 }
 

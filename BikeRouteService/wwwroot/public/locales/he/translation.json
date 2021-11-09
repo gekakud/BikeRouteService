@@ -1,0 +1,31 @@
+{
+  "routeName": "רוט נאָמען",
+  "search": "זוכן",
+  "addRoute": "לייג בייק מאַרשרוט",
+  "filters": {
+    "showAllBtn": "ווייַזן אַלע רוץ",
+    "clearMapBtn": "קלאָר מאַפּע",
+    "diffSelectLabel": "רוט שוועריקייט",
+    "diffSelect": {
+      "key_0": "אַלע",
+      "key_1": "אָנהייבער",
+      "key_2": "ינטערמידייט",
+      "key_3": "פּראָפעסיאָנאַל",
+      "key_4": "חיה"
+    },
+    "typeSelectLabel": "רוט טיפּ",
+    "typeSelect": {
+      "key_0": "אַלע",
+      "key_1": "Mtb",
+      "key_2": "גראַוואַל",
+      "key_3": "וועג",
+      "key_4": "געמישט"
+    },
+    "filterBtn": "פילטער"
+  },
+  "elevation": "מעטער",
+  "distance": "קילאמעטער",
+  "uploadFormTitle": "ווילן צו לייגן אַ בייק מאַרשרוט?",
+  "uploadBtn": "צופֿעליקער",
+  "file": "טעקע"
+}

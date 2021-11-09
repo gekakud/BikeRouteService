@@ -1,18 +1,24 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
+// import 'mapbox-gl/dist/mapbox-gl.css';
 import './index.css';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import { ThemeProvider } from 'react-bootstrap';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { ThemeProvider } from 'react-bootstrap';
+import Loader from './components/Loader/Loader';
+
 import '@fortawesome/fontawesome-svg-core/styles.css' 
+
+import './i18n'
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProvider dir="rtl">
-      <App />
+    <Suspense fallback={<Loader fullViewport />}>
+      <ThemeProvider dir="rtl" lang="he" >
+        <App />
       </ThemeProvider>
+    </Suspense>
   </React.StrictMode>,
   document.getElementById('root')
 );

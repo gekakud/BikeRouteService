@@ -1,26 +1,27 @@
-import { faArrowUp, faLongArrowAltRight, faSignal } from '@fortawesome/free-solid-svg-icons'
+// import { faArrowUp, faLongArrowAltRight, faSignal } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useState, useCallback } from 'react'
 import { Col, Collapse, Row, Button } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next';
 import './index.scss';
 
-const routeDiff = [
-  'Begginer',
-  'Intermediate',
-  'Proficient',
-  'Beast'
-]
+// const routeDiff = [
+//   'Begginer',
+//   'Intermediate',
+//   'Proficient',
+//   'Beast'
+// ]
+// const routeType = [
+//   'Mtb',
+//   'Gravel',
+//   'Road',
+//   'Mixed'
+// ]
 
-const routeType = [
-  'Mtb',
-  'Gravel',
-  'Road',
-  'Mixed'
-]
-
-
-const ListItem = ({route, isFirst, setSelectedRouteListItem}) => {
+const ListItem = ({route, isFirst, setSelectedRouteListItem, onClick}) => {
   const [open, setOpen] = useState(false)
+
+  const { t } = useTranslation()
 
   const handleCollapse = useCallback(
     () => {
@@ -43,6 +44,13 @@ const ListItem = ({route, isFirst, setSelectedRouteListItem}) => {
     [setSelectedRouteListItem],
   )
 
+  const handleRouteTypeBtn = useCallback(
+    () => {
+      onClick && onClick({routeType: route.properties.RouteType})
+    }, 
+    [onClick, route]
+  )
+
   return (
     <Row className={`${ isFirst ? '' : 'mt-4'}`}>
       <Col xs={12}>
@@ -54,8 +62,9 @@ const ListItem = ({route, isFirst, setSelectedRouteListItem}) => {
 
           <div>
 
-            <Button variant="primary" style={{float: 'right'}}>
-              {routeType[route.properties.RouteType]}
+            <Button variant="primary" style={{float: 'right'}} onClick={handleRouteTypeBtn}>
+              {/* {routeType[route.properties.RouteType]} */}
+              {t(`filters.typeSelect.key_${[+route.properties.RouteType + 1]}`)}
             </Button>
 
             <h3 onClick={handleCollapse} className="mb-2">{route.properties.RouteName} </h3>
@@ -70,17 +79,18 @@ const ListItem = ({route, isFirst, setSelectedRouteListItem}) => {
 
           <div className="list-item__info py-3 mt-2">
             <span className={`me-3 d-inline-flex align-items-center justify-content-start`}>
-              <FontAwesomeIcon icon={faSignal} className={`me-1 blue-light`}/>
-              {routeDiff[route.properties.RouteDifficulty]}
+              <FontAwesomeIcon icon='signal' className={`me-1 blue-light`}/>
+              {/* {routeDiff[route.properties.RouteDifficulty]} */}
+              { t(`filters.diffSelect.key_${[+route.properties.RouteDifficulty + 1]}`) }
 
             </span>
             <span className={`me-3 d-inline-flex align-items-center justify-content-start`}>
-              <FontAwesomeIcon icon={faLongArrowAltRight} className={`me-1 blue-light`}/>
-                {route.properties.RouteLength.toFixed(2)} km
+              <FontAwesomeIcon icon='long-arrow-alt-right' className={`me-1 blue-light`}/>
+                {route.properties.RouteLength.toFixed(2)} { t('distance') }
             </span>
             <span className={`me-3 d-inline-flex align-items-center justify-content-start`}>
-              <FontAwesomeIcon icon={faArrowUp} className={`me-1 blue-light`}/>
-                {Math.round(route.properties.ElevationGain)} meters
+              <FontAwesomeIcon icon='arrow-up' className={`me-1 blue-light`}/>
+                {Math.round(route.properties.ElevationGain)} { t('elevation') }
             </span>
           </div>
 

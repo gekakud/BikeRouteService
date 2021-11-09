@@ -1,15 +1,14 @@
-import { useCallback } from 'react'
-import { Collapse, Container } from "react-bootstrap"
+import { Container } from "react-bootstrap"
 import ListItem from "./listItem/ListItem"
 import './index.scss'
 
-const BikeRoutesList = ({ routes, routesListRef, freeListViewportHeight,setSelectedRouteListItem }) => {
+const BikeRoutesList = ({ routes, freeListViewportHeight,setSelectedRouteListItem, onFilter }) => {
 
   return (
     <Container
       fluid 
       className="feature-listing"
-      ref={routesListRef}
+      // ref={routesListRef}
       style={{maxHeight: `${freeListViewportHeight}px`}}  
     >
       { 
@@ -20,6 +19,7 @@ const BikeRoutesList = ({ routes, routesListRef, freeListViewportHeight,setSelec
             route={route} 
             isFirst={isFirst}
             setSelectedRouteListItem={setSelectedRouteListItem}
+            onClick={onFilter}
           />
         })
       }

@@ -1,10 +1,7 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
-import ReactDOM from 'react-dom'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { instance } from '../../api/api';
 import Tooltip from './tooltip/Tooltip'
 import { toast } from 'react-toastify'
-// import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
-import { Spinner } from 'react-bootstrap';
 import ReactMapGL, { 
   Marker,
   NavigationControl,
@@ -15,10 +12,7 @@ import ReactMapGL, {
   Source,
   WebMercatorViewport,
 } from 'react-map-gl';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 import bbox from '@turf/bbox';
-// mapboxgl.accessToken = 'pk.eyJ1IjoiZ2VrYXBlayIsImEiOiJja3J3MDc5aDUwYnVtMnZuODI3bnN4bWo4In0.Y7ifVj3T99VpyiLNuLEVnQ';
 
 
 const routeDifficultyColors = { 
@@ -27,27 +21,13 @@ const routeDifficultyColors = {
   2 : 'red' ,
   3 : 'black' , 
 };
-const routeTypeColors = { 
-  //   mtb, gravel, road, mixed
-  0 : 'green' , 
-  1 : 'red' ,
-  2 : 'black' ,
-  3 : 'orange' , 
-};
-
-const routeLayer = {
-  'id': 'route-layer',
-  'type': 'line',
-  'source': 'route',
-  'layout': {
-      'line-join': 'round',
-      'line-cap': 'round'
-  },
-  'paint': {
-      'line-color': 'green',
-      'line-width': 5
-  }
-}
+// const routeTypeColors = { 
+//   //   mtb, gravel, road, mixed
+//   0 : 'green' , 
+//   1 : 'red' ,
+//   2 : 'black' ,
+//   3 : 'orange' , 
+// };
 
 const ICON = `M192 0C85.97 0 0 85.97 0 192c0 77.41 26.97 99.03 172.3 309.7c9.531 13.77 29.91 13.77 39.44 0C357 291 384 269.4 384 192C384 85.97 298 0 192 0zM192 271.1c-44.13 0-80-35.88-80-80S147.9 111.1 192 111.1s80 35.88 80 80S236.1 271.1 192 271.1z`;
 const pinStyle = {
@@ -56,10 +36,16 @@ const pinStyle = {
   stroke: 'none'
 };
 
-const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, setRefreshMap }) => {
-  const mapContainer = useRef(null);
+const markerSvgSize = 35
+
+const initialMapParams = {
+  latitude: 32.796048,
+  longitude: 35.374668,
+  zoom: 8,
+}
+
+const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRouteListItem, freeMapViewportHeight, setRefreshMap }) => {
   const map = useRef(null);
-  const markers = useRef([]);
   const [layerOptions, setLayerOptions] = useState({
     'id': 'route-layer',
     'type': 'line',
@@ -74,28 +60,25 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
     }
   })
 
-  const [size, setSize] = useState(38)
-  const [loading, setLoading] = useState(false)
+ 
 
-  const [viewport, setViewport] = useState({
-    latitude: 32.796048,
-    longitude: 35.374668,
-    zoom: 8,
+  const [mapViewport, setMapViewport] = useState({
+    ...initialMapParams,
     width: "100%",
     height: `${freeMapViewportHeight}px`,
-    transitionDuration: 800,
+    transitionDuration: 500,
     transitionInterpolator: new LinearInterpolator(),
     // transitionInterpolator: new FlyToInterpolator(),
   });
 
   const [selectedRoute, setSelectedRoute] = useState(null)
-  const [selectedLayer, setSelectedLayer] = useState(null)
+  // const [selectedLayer, setSelectedLayer] = useState(null)
 
   const handleMarkerClick = useCallback(
     (route) => {
       // setSelectedRoute(route)
 
-      setViewport(prev => {
+      setMapViewport(prev => {
         return {
           ...prev, 
           transitionInterpolator: new FlyToInterpolator()
@@ -123,59 +106,35 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
             }
           })
 
-          // layerRef.current.paint['line-color'] = routeDifficultyColors[route.properties.RouteDifficulty]
-
           setSelectedLayer(data)
 
-          const { coordinates } = data.features[0].geometry
-
           const bounds = bbox(data)
-
-          console.log(`bounds`, bounds)
-
           const mapCanvas = map.current.getMap()._canvas
-
-          console.log(`mapCanvas`, mapCanvas)
-
-          console.log(`viewport`, viewport)
-          console.log(`map.current.getMap()`, map.current.getMap())
-          console.log(`map.current.getMap().getStyle()`, map.current.getMap().getStyle())
-          // console.log(`map.current.queryRenderedFeatures()`, map.current.queryRenderedFeatures())
 
           const routeViewport = new WebMercatorViewport({
             width: mapCanvas.clientWidth,
             height: mapCanvas.clientHeight,
           })
           
-          console.log(`routeViewport`, routeViewport)
-
-          const t = routeViewport.fitBounds(
+          const routeFittedViewport = routeViewport.fitBounds(
             [ 
               [bounds[0], bounds[1]],
               [bounds[2], bounds[3]],
             ],
             {
-              padding: 45,
+              padding: 50,
             }
           )
 
-          console.log(`t`, t)
+          console.log(`routeFittedViewport`, routeFittedViewport)
 
-          setViewport(prevView => {
+          setMapViewport(prevView => {
             return {
               ...prevView, 
-              // latitude: route.geometry.coordinates[1],
-              // longitude: route.geometry.coordinates[0],
-              // zoom: 15,
-              ...t,
+              ...routeFittedViewport,
               transitionInterpolator: new LinearInterpolator()
             }
           })
-    
-          setTimeout(() => {
-            setSelectedRoute(route)
-          }, 300)
-
         }
       })
       .catch(e => {
@@ -183,77 +142,79 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
       })
 
     },
-    [],
+    [setSelectedLayer],
   )
+
   const handleMarkerEnter = useCallback(
     (route) => {
-      console.log(`event enter`, route)
       setSelectedRoute(route)
     },
     [],
   )
+
   const handleMarkerLeave = useCallback(
     () => {
-      console.log(`event leave`)
       setSelectedRoute(null)
     },
     [],
   )
 
-  const handleViewportChange = useCallback(
+  const handleMapViewportChange = useCallback(
     (viewport) => {
-      setViewport(viewport)
-    },
-    [],
-  )
-  
-  const handleZoomChange = useCallback(
-    (interactionState) => {
-      console.log(`interactionState`, interactionState)
+      setMapViewport(viewport)
     },
     [],
   )
 
+  /** Update map size when needed  */
   useEffect(() => {
 
     if (refreshMap) {
-      setViewport(prev => {
+
+      const newOptions = {
+        width: "100%",
+        height: `${freeMapViewportHeight}px`,
+      }
+
+      if (refreshMap === 1) {
+        Object.assign(newOptions, initialMapParams)
+      }
+
+      console.log(`newOptions`, newOptions)
+
+      setMapViewport(prev => {
         return {
           ...prev,
-          width: "100%",
-          height: `${freeMapViewportHeight}px`,
+          ...newOptions,
         }
       })
-
+      
       setRefreshMap(false)
     }
 
   }, [refreshMap, freeMapViewportHeight, setRefreshMap])
 
-  // zoomMapToRoute
+  /** Zoom Map To Selectted Route */
   useEffect(() => {
     
     if (selectedRouteListItem) {
-      setViewport(prev => {
+      setMapViewport(prevViewport => {
         return {
-          ...prev,
+          ...prevViewport, 
+          latitude: selectedRouteListItem.geometry.coordinates[1],
+          longitude: selectedRouteListItem.geometry.coordinates[0],
+          zoom: 11,  
           transitionInterpolator: new FlyToInterpolator()
         }
       })
-
-      setTimeout(() => {
-        setViewport(prevViewport => {
-          return {
-            ...prevViewport, 
-            latitude: selectedRouteListItem.geometry.coordinates[1],
-            longitude: selectedRouteListItem.geometry.coordinates[0],
-            zoom: 15,
-            transitionInterpolator: new LinearInterpolator()
-  
-          }
-        })
-      }, 0)
       
+    } else {
+      setMapViewport(prev => {
+        return {
+          ...prev,
+          transitionInterpolator: new LinearInterpolator()
+        }
+      })
     }
 
   }, [selectedRouteListItem])
@@ -262,12 +223,9 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
     <>
       <ReactMapGL
         mapboxApiAccessToken={`pk.eyJ1IjoiZ2VrYXBlayIsImEiOiJja3J3MDc5aDUwYnVtMnZuODI3bnN4bWo4In0.Y7ifVj3T99VpyiLNuLEVnQ`}
-        {...viewport}
+        {...mapViewport}
         mapStyle={`mapbox://styles/mapbox/streets-v11`}
-        onViewportChange={handleViewportChange}
-        onInteractionStateChange={handleZoomChange}
-        // transitionDuration={800}
-        // transitionInterpolator={new FlyToInterpolator()}
+        onViewportChange={handleMapViewportChange}
         ref={map}
       >
         <NavigationControl style={{right: 10, top: 10}} />
@@ -281,16 +239,20 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
                 key={properties.RouteName}
                 latitude={coordinates[1]}
                 longitude={coordinates[0]}
-                className={`marker-custom`}     
+                className={`marker-custom`}
+                offsetLeft={-13}
+                offsetTop={-35}
               >
                 <div
                   onClick={() => handleMarkerClick(route)}
                   onMouseEnter={() => handleMarkerEnter(route)}
                   onMouseLeave={() => handleMarkerLeave(route)}
+                  style={{
+                    filter: 'drop-shadow(1px 0px 2px rgba(106, 106, 106, 0.91))'
+                  }}
                 > 
                   <svg 
-                    height={viewport.zoom * 4}
-                    // height={size}
+                    height={markerSvgSize}
                     viewBox="0 0 384 512"
                     style={{...pinStyle, fill: `${ routeDifficultyColors[properties.RouteDifficulty] }`}}
                   >
@@ -306,8 +268,8 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
           selectedRoute && <Popup
             latitude={selectedRoute.geometry.coordinates[1]}
             longitude={selectedRoute.geometry.coordinates[0]}
-            offsetTop={-5}
-            offsetLeft={viewport.zoom * 4 / 2.5}
+            offsetTop={-40}
+            offsetLeft={0}
             closeButton={false}
           >
             <Tooltip pointProps={selectedRoute.properties} />
@@ -323,7 +285,6 @@ const Map = ({routes, refreshMap, selectedRouteListItem, freeMapViewportHeight, 
         }
           
       </ReactMapGL>
-      {/* { loading && <Spinner animation="border" variant="primary" style={{position: 'absolute', left: '50%', top: '50%'}} /> } */}
     </>
   )
 }
