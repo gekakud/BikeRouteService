@@ -1,7 +1,7 @@
-import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
+import { useCallback, useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react'
 import { instance } from './api/api';
-import { Col, Container, Row } from 'react-bootstrap';
 import './App.scss';
+import { Col, Container, Row } from 'react-bootstrap';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fab } from '@fortawesome/free-brands-svg-icons'
 
@@ -10,19 +10,18 @@ import RoutesFilter from './components/routesFilter/RoutesFilter';
 import BikeRoutesList from './components/bikeRoutesList/BikeRoutesList';
 import UploadBikeRoute from './components/uploadBikeRoute/UploadBikeRoute';
 import Header from './components/header/Header';
-import FiltersToggler from './components/routesFilter/filtersToggler/FiltersToggler';
 import Loader from './components/Loader/Loader';
 import Footer from './components/footer/Footer';
+import MapToggler from './components/toggler/mapToggler/MapToggler';
+import FiltersToggler from './components/toggler/filterToggler/FilterToggler';
 
 import { toast, ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-import { faPlus, faSearch, faArrowUp, faLongArrowAltRight, faSignal,faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faSearch, faArrowUp, faLongArrowAltRight, faSignal,faArrowLeft, faArrowRight, faMap, faFilter, faList } from '@fortawesome/free-solid-svg-icons'
 
-library.add(fab, faPlus, faSearch, faArrowUp, faLongArrowAltRight, faSignal, faArrowLeft, faArrowRight)
-
-console.log(`fab`, fab)
+library.add(fab, faPlus, faSearch, faArrowUp, faLongArrowAltRight, faSignal, faArrowLeft, faArrowRight, faMap, faFilter, faList)
 
 function App() {
 
@@ -35,17 +34,31 @@ function App() {
   const [selectedLayer, setSelectedLayer] = useState(null)
   const [routesLoading, setRoutesLoading] = useState(false)
 
+  const [isMapOpen, setIsMapOpen] = useState(window.innerWidth < 992)
   const [isFiltersOpen, setIsFiltersOpen] = useState(true)
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
   const [refreshMap, setRefreshMap] = useState(false)
   const [freeViewportHeight, setFreeViewportHeight] = useState( (window.innerHeight - 80) )
+  const [filtersHeight, setFiltersHeight] = useState(null)
 
-  const filtersRef = useRef(null)
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
-  // const listFreeViewportHeight = useMemo(() => {
-  //   return freeViewportHeight - 20 - filtersRef?.current?.clientHeight
-  // }, [freeViewportHeight, filtersRef.current])
+
+  const hideFiltersCondition = useMemo(
+    () => {
+      if (windowWidth < 992) {
+        return (!isMapOpen && !isFiltersOpen)
+      }
+
+      return false;
+    },
+    [isMapOpen, isFiltersOpen, windowWidth]
+  )
+
+  const listFreeViewportHeight = useMemo(() => {
+    return freeViewportHeight - 50 - filtersHeight
+  }, [freeViewportHeight, filtersHeight])
 
   const toggleUploadModal =  useCallback(( show = null ) => {
       setIsUploadModalOpen(prev => ( show !== null ? show : !prev ))
@@ -104,17 +117,23 @@ function App() {
         })
 
         setFilteredRoutes(filtered)
+        setRefreshMap(1)
+        setSelectedLayer(null)
+
+        if (windowWidth < 992) {
+          setIsFiltersOpen(false)
+        }
       }
 
       setRoutesLoading(false)
     },
-    [routes]
+    [routes, windowWidth]
   )
 
   useEffect(() => {
       setRefreshMap(true)
-  }, [isFiltersOpen])
-
+  }, [isMapOpen])
+ 
   /** window resize map sizes handler  */
   useEffect(() => {
 
@@ -125,15 +144,16 @@ function App() {
         setFreeViewportHeight(currentFreeVieportHeight)
       }
 
+      setWindowWidth(window.innerWidth)
       setRefreshMap(true)
     }
 
     window.addEventListener('resize', handleWindowResize)
 
     return () => {
-      window.removeEventListener('resize', handleWindowResize)
+      window.removeEventListener('resize', handleWindowResize) 
     }
-  },)
+  }, [])
 
   /** Sync filtered routes state with general routes state */
   useEffect(() => {
@@ -177,26 +197,47 @@ function App() {
         <Row>
           <Header uploadModalToggler={toggleUploadModal} onSearch={onSearch} />
         </Row>
-        <Row className="content-main align-items-start">
-          <Col xs={6} xl={5} className={isFiltersOpen ? null : 'd-none'} style={{maxHeight: `${freeViewportHeight}px`, overflow: 'hidden', }}>
-            <RoutesFilter  
-              filtersRef={filtersRef}
-              onFilter={onFilter}
-              onClearMap={onClearMap}
-              onShowAll={onShowAll}
-            />
+        <Row className="content-main align-items-start" style={{position: 'relative'}}>
+          {
+            windowWidth < 992 ? 
+              (
+                <>
+                  <MapToggler mobile setIsMapOpen={setIsMapOpen} isMapOpen={isMapOpen} /> 
+                  <FiltersToggler mobile isFiltersOpen={isFiltersOpen} isMapOpen={isMapOpen} setIsFiltersOpen={setIsFiltersOpen} />
+                </>
+              ) : null
+          }
+          <Col 
+            xs={12} lg={5} 
+            className={`${isMapOpen ? 'd-none' : null } ${windowWidth < 992 ? 'ps-5' : null} `} 
+            style={{maxHeight: `${freeViewportHeight}px`, overflow: 'hidden', position: 'relative'}}
+          >
+            {/* <div ref={filtersRef} /> */}
+              <RoutesFilter
+                setFiltersHeight={setFiltersHeight}
+                onFilter={onFilter}
+                onClearMap={onClearMap}
+                onShowAll={onShowAll}
+                hideFiltersCondition={hideFiltersCondition}
+              />
             { filteredRoutes && <BikeRoutesList
                 routes={filteredRoutes} 
                 onFilter={onFilter}
-                freeListViewportHeight={freeViewportHeight - 50 - filtersRef?.current?.clientHeight}
+                freeListViewportHeight={listFreeViewportHeight}
                 setSelectedRouteListItem={setSelectedRouteListItem}
+                hideFiltersCondition={hideFiltersCondition}
+                windowWidth={windowWidth}
               />
             }
             { 
               routesLoading && <Loader/>
             }
           </Col>
-          <Col xs={isFiltersOpen ? 6 : 12} xl={isFiltersOpen ? 7 : 12} style={{position: 'relative'}} className="gx-0">
+          <Col 
+            xs={12} lg={isMapOpen ? 12 : 7} 
+            style={{position: 'relative'}} 
+            className={`gx-0 ${!isMapOpen && windowWidth < 992 ? 'd-none' : null}`}
+          >
             <Row className="gx-0">
               <Col xs={12}>
                 <Map
@@ -208,7 +249,12 @@ function App() {
                     setSelectedLayer={setSelectedLayer}
                     selectedLayer={selectedLayer}
                 />
-                <FiltersToggler setIsFiltersOpen={setIsFiltersOpen} isFiltersOpen={isFiltersOpen} />
+
+                { 
+                  windowWidth >= 992 ? 
+                    <MapToggler setIsMapOpen={setIsMapOpen} isMapOpen={isMapOpen} /> : null
+                }
+
               </Col>
             </Row>
               

@@ -1,7 +1,8 @@
 .mapboxgl-popup-content {
-  border-radius: 6px;
-  min-width: 310px;
-  padding: 0;
+  border-radius: 6px !important;
+  min-width: 300px;
+  padding: 0 !important;
+  // padding: 0;
   overflow: hidden;
 
   h3 {
@@ -11,6 +12,16 @@
 
     &::first-letter {
       text-transform: uppercase;
+    }
+  }
+}
+
+html {
+  &[dir="rtl"] {
+    .mapboxgl-popup-content {
+      svg {
+        transform: rotateY(180deg);
+      }
     }
   }
 }

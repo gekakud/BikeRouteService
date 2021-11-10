@@ -1,13 +1,13 @@
+import './index.scss'
 import { Container } from "react-bootstrap"
 import ListItem from "./listItem/ListItem"
-import './index.scss'
 
-const BikeRoutesList = ({ routes, freeListViewportHeight,setSelectedRouteListItem, onFilter }) => {
+const BikeRoutesList = ({ routes, freeListViewportHeight,setSelectedRouteListItem, onFilter, hideFiltersCondition, windowWidth }) => {
 
   return (
     <Container
       fluid 
-      className="feature-listing"
+      className={`feature-listing ${ windowWidth < 992 && !hideFiltersCondition ? 'd-none' : null}`}
       // ref={routesListRef}
       style={{maxHeight: `${freeListViewportHeight}px`}}  
     >

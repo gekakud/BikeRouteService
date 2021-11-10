@@ -5,14 +5,13 @@ import { initReactI18next } from "react-i18next";
 
 
 i18next
-    .use(I18NextHttpBackend)
-   .use(I18nextBrowserLanguageDetector)
-   .use(initReactI18next)
-   .init({
-     debug: true, 
-     fallbackLng: 'en',
+  .use(I18NextHttpBackend)
+  .use(I18nextBrowserLanguageDetector)
+  .use(initReactI18next)
+  .init({
+    debug: false, 
+    fallbackLng: 'en',
+  })
 
-   })
 
-
-   export default i18next
+export default i18next

@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { instance } from '../../api/api';
-import Tooltip from './tooltip/Tooltip'
 import { toast } from 'react-toastify'
 import ReactMapGL, { 
   Marker,
@@ -13,6 +12,7 @@ import ReactMapGL, {
   WebMercatorViewport,
 } from 'react-map-gl';
 import bbox from '@turf/bbox';
+import Tooltip from './tooltip/Tooltip'
 
 
 const routeDifficultyColors = { 
@@ -94,7 +94,7 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
         if (response.status === 200) {
           const data = JSON.parse(response.data)
 
-          console.log(`data`, data)
+          // console.log(`data`, data)
 
           setLayerOptions(prev => {
             return {
@@ -126,7 +126,7 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
             }
           )
 
-          console.log(`routeFittedViewport`, routeFittedViewport)
+          // console.log(`routeFittedViewport`, routeFittedViewport)
 
           setMapViewport(prevView => {
             return {
@@ -179,8 +179,6 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
       if (refreshMap === 1) {
         Object.assign(newOptions, initialMapParams)
       }
-
-      console.log(`newOptions`, newOptions)
 
       setMapViewport(prev => {
         return {

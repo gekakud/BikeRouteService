@@ -1,5 +1,5 @@
 .feature-listing {
-  overflow: auto;
+  overflow-y: auto;
   margin-top: 30px;
 
   &::-webkit-scrollbar {
@@ -7,7 +7,6 @@
     border-radius: 10px;
     background-color: #eee;
   }
-  &
 
   &::-webkit-scrollbar-thumb {
     background: #2F3B59;
@@ -28,6 +27,19 @@ html {
         .list-item {
           .btn {
             float: left !important;
+          }
+
+          &__info {
+            svg {
+              display: inline-block;
+              transform: rotateY(180deg);
+              // flex-direction: row-reverse;
+
+              // &.me-1 {
+              //   margin-right: 0 !important;
+              //   margin-left: 0.25rem !important;
+              // }
+            }
           }
         }
       }

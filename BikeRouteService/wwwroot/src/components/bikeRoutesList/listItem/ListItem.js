@@ -1,9 +1,9 @@
 // import { faArrowUp, faLongArrowAltRight, faSignal } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useState, useCallback } from 'react'
+import './index.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Col, Collapse, Row, Button } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next';
-import './index.scss';
 
 // const routeDiff = [
 //   'Begginer',
@@ -79,17 +79,17 @@ const ListItem = ({route, isFirst, setSelectedRouteListItem, onClick}) => {
 
           <div className="list-item__info py-3 mt-2">
             <span className={`me-3 d-inline-flex align-items-center justify-content-start`}>
-              <FontAwesomeIcon icon='signal' className={`me-1 blue-light`}/>
+              <FontAwesomeIcon icon='signal' className={`me-1 blue-light`}/> &nbsp;
               {/* {routeDiff[route.properties.RouteDifficulty]} */}
               { t(`filters.diffSelect.key_${[+route.properties.RouteDifficulty + 1]}`) }
 
             </span>
             <span className={`me-3 d-inline-flex align-items-center justify-content-start`}>
-              <FontAwesomeIcon icon='long-arrow-alt-right' className={`me-1 blue-light`}/>
+              <FontAwesomeIcon icon='long-arrow-alt-right' className={`me-1 blue-light`}/> &nbsp;
                 {route.properties.RouteLength.toFixed(2)} { t('distance') }
             </span>
             <span className={`me-3 d-inline-flex align-items-center justify-content-start`}>
-              <FontAwesomeIcon icon='arrow-up' className={`me-1 blue-light`}/>
+              <FontAwesomeIcon icon='arrow-up' className={`me-1 blue-light`}/> &nbsp;
                 {Math.round(route.properties.ElevationGain)} { t('elevation') }
             </span>
           </div>

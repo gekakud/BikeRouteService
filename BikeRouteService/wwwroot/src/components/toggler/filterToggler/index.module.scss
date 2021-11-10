@@ -1,6 +1,6 @@
 .toggler {
   position: absolute;
-  top: 10px;
+  top: 80px;
   left: 10px;
   background-color: #eee;
   border-radius: 6px;
@@ -8,6 +8,10 @@
   box-shadow: 0px 0px 6px 0px rgb(130, 130, 130);
   cursor: pointer;
   border: none;
+  // width: auto;
+  width: 45px;
+  height: 45px;
+  z-index: 1;
 
   svg path {
     fill: #2F3B59;
@@ -20,4 +24,9 @@
       fill: #eee;
     }
   }
+}
+
+.mobile {
+  width: 40px;
+  height: 40px;
 }
