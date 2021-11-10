@@ -5,7 +5,8 @@ import { useTranslation } from "react-i18next";
 const lngs = {
   en: { nativeName: 'English' },
   ru: { nativeName: 'Russian' },
-  he: { nativeName: 'Hebrew' }
+  he: { nativeName: 'Hebrew' },
+  ua: { nativeName: 'Ukrainian' }
 }
 
 const LangSwitcher = () => {

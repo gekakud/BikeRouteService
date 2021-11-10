@@ -1,31 +1,31 @@
 {
-  "routeName": "רוט נאָמען",
-  "search": "זוכן",
-  "addRoute": "לייג בייק מאַרשרוט",
+  "routeName": "שם מסלול",
+  "search": "חיפוש",
+  "addRoute": "הוסף מסלול חדש",
   "filters": {
-    "showAllBtn": "ווייַזן אַלע רוץ",
-    "clearMapBtn": "קלאָר מאַפּע",
-    "diffSelectLabel": "רוט שוועריקייט",
+    "showAllBtn": "להציג כל המסלולים",
+    "clearMapBtn": "נקה הכל",
+    "diffSelectLabel": "רמת קושי",
     "diffSelect": {
-      "key_0": "אַלע",
-      "key_1": "אָנהייבער",
-      "key_2": "ינטערמידייט",
-      "key_3": "פּראָפעסיאָנאַל",
+      "key_0": "הכל",
+      "key_1": "מתחיל",
+      "key_2": "בינוני",
+      "key_3": "מיומן",
       "key_4": "חיה"
     },
-    "typeSelectLabel": "רוט טיפּ",
+    "typeSelectLabel": "סוג המסלול",
     "typeSelect": {
-      "key_0": "אַלע",
-      "key_1": "Mtb",
-      "key_2": "גראַוואַל",
-      "key_3": "וועג",
-      "key_4": "געמישט"
+      "key_0": "הכל",
+      "key_1": "הרים",
+      "key_2": "גראבל",
+      "key_3": "כביש",
+      "key_4": "משולב"
     },
-    "filterBtn": "פילטער"
+    "filterBtn": "סינון"
   },
-  "elevation": "מעטער",
-  "distance": "קילאמעטער",
-  "uploadFormTitle": "ווילן צו לייגן אַ בייק מאַרשרוט?",
-  "uploadBtn": "צופֿעליקער",
-  "file": "טעקע"
+  "elevation": "מטר",
+  "distance": "קילומטר",
+  "uploadFormTitle": "רוצה להוסיף מסלול?",
+  "uploadBtn": "לעלות",
+  "file": "קובץ"
 }
