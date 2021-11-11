@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 
 namespace BikeRouteService
 {
@@ -67,6 +68,12 @@ namespace BikeRouteService
                     }
                 });
             });
+
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "wwwroot/build";
+            });
         }
         
         // Inside of Configure method we set up middleware that handles
@@ -86,12 +93,8 @@ namespace BikeRouteService
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
-            
-            //app.UseStaticFiles(new StaticFileOptions() {
-            //    FileProvider =  new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "client_web_app", "listing", "citybook")),
-            //    RequestPath = new PathString("/listing")
-            //});
-            
+            app.UseSpaStaticFiles();
+
             app.UseHttpsRedirection();
             app.UseRouting();
 
@@ -105,6 +108,16 @@ namespace BikeRouteService
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "wwwroot";
+
+                if (env.IsDevelopment())
+                {
+                    spa.UseReactDevelopmentServer(npmScript: "start");
+                }
             });
         }
     }

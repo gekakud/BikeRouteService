@@ -20,7 +20,7 @@ namespace BikeRouteService
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>().UseUrls("http://*:6001");
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }
