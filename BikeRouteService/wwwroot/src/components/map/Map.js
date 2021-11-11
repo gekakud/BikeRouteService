@@ -13,6 +13,7 @@ import ReactMapGL, {
 } from 'react-map-gl';
 import bbox from '@turf/bbox';
 import Tooltip from './tooltip/Tooltip'
+import axios from 'axios';
 
 
 const routeDifficultyColors = { 
@@ -44,8 +45,15 @@ const initialMapParams = {
   zoom: 8,
 }
 
+const flyToSpeed = {
+  speed: 1.2,
+}
+
+let cancelToken = undefined
+
 const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRouteListItem, freeMapViewportHeight, setRefreshMap }) => {
   const map = useRef(null);
+
   const [layerOptions, setLayerOptions] = useState({
     'id': 'route-layer',
     'type': 'line',
@@ -60,7 +68,12 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
     }
   })
 
+  const [popupPosition, setPopupPosition] = useState({
+    offsetTop: -35,
+    anchor: "bottom"
+  })
  
+  window.mapy = map.current;
 
   const [mapViewport, setMapViewport] = useState({
     ...initialMapParams,
@@ -74,9 +87,54 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
   const [selectedRoute, setSelectedRoute] = useState(null)
   // const [selectedLayer, setSelectedLayer] = useState(null)
 
+  const popupPositioning = useCallback(
+    (e) => {
+      const marker = e.currentTarget.closest('.mapboxgl-marker'),
+      transform = marker && marker.style.transform.match(/(\d+)/g),
+      transformY = transform && transform.length > 1 && transform[1],
+      mapContainerHeight =  map.current.getMap().getCanvas().clientHeight
+
+      const popupHeight = 230
+      const conditionToBottom = transformY < popupHeight
+      const conditionToTop = transformY > mapContainerHeight - popupHeight
+
+      // console.log(`conditionToBottom`, conditionToBottom)
+      // console.log(`conditionToTop`, conditionToTop)
+
+      if (conditionToBottom) {
+        setPopupPosition({
+          offsetTop: 10,
+          anchor: "top"
+        })
+      }
+
+      if (conditionToTop) {
+        setPopupPosition({
+          offsetTop: -35,
+          anchor: "bottom"
+        })
+      }
+
+      if (!conditionToTop && !conditionToBottom) {
+        setPopupPosition({
+          offsetTop: -35,
+          anchor: "bottom"
+        })
+      }
+    },
+    []
+  )
+
+
   const handleMarkerClick = useCallback(
     (route) => {
       // setSelectedRoute(route)
+
+      if (cancelToken) {
+        cancelToken.cancel("Operation canceled due to new request.")
+      }
+
+      cancelToken = axios.CancelToken.source();
 
       setMapViewport(prev => {
         return {
@@ -88,7 +146,8 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
       instance.get('GetRouteGeoJsonByName', {
         params: {
           routeName: route.properties.RouteName
-        }
+        },
+        cancelToken: cancelToken.token
       })
       .then(response => {
         if (response.status === 200) {
@@ -138,7 +197,7 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
         }
       })
       .catch(e => {
-        toast.error(e.message)
+        // toast.error(e.message)
       })
 
     },
@@ -146,10 +205,11 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
   )
 
   const handleMarkerEnter = useCallback(
-    (route) => {
+    (route, event) => {
+      popupPositioning(event)
       setSelectedRoute(route)
     },
-    [],
+    [popupPositioning],
   )
 
   const handleMarkerLeave = useCallback(
@@ -196,6 +256,8 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
   useEffect(() => {
     
     if (selectedRouteListItem) {
+      setSelectedRoute(selectedRouteListItem)
+      
       setMapViewport(prevViewport => {
         return {
           ...prevViewport, 
@@ -207,6 +269,7 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
       })
       
     } else {
+      setSelectedRoute(null)
       setMapViewport(prev => {
         return {
           ...prev,
@@ -239,12 +302,12 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
                 longitude={coordinates[0]}
                 className={`marker-custom`}
                 offsetLeft={-13}
-                offsetTop={-35}
+                offsetTop={-30}
               >
                 <div
                   onClick={() => handleMarkerClick(route)}
-                  onMouseEnter={() => handleMarkerEnter(route)}
-                  onMouseLeave={() => handleMarkerLeave(route)}
+                  onMouseEnter={(e) => handleMarkerEnter(route, e)}
+                  onMouseLeave={(e) => handleMarkerLeave(route, e)}
                   style={{
                     filter: 'drop-shadow(1px 0px 2px rgba(106, 106, 106, 0.91))'
                   }}
@@ -266,8 +329,9 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
           selectedRoute && <Popup
             latitude={selectedRoute.geometry.coordinates[1]}
             longitude={selectedRoute.geometry.coordinates[0]}
-            offsetTop={-40}
+            // offsetTop={-35}
             offsetLeft={0}
+            {...popupPosition}
             closeButton={false}
           >
             <Tooltip pointProps={selectedRoute.properties} />

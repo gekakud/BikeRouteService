@@ -19,9 +19,15 @@ import { toast, ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-import { faPlus, faSearch, faArrowUp, faLongArrowAltRight, faSignal,faArrowLeft, faArrowRight, faMap, faFilter, faList } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faSearch, faArrowUp, faLongArrowAltRight, faSignal,faArrowLeft, faArrowRight, faMap, faFilter, faList, faFileDownload, faCircleNotch } from '@fortawesome/free-solid-svg-icons'
 
-library.add(fab, faPlus, faSearch, faArrowUp, faLongArrowAltRight, faSignal, faArrowLeft, faArrowRight, faMap, faFilter, faList)
+library.add(
+  fab, faPlus, faSearch, faArrowUp, 
+  faLongArrowAltRight, faSignal, faArrowLeft, 
+  faArrowRight, faMap, faFilter, faList, 
+  faFileDownload, faCircleNotch
+)
+
 
 function App() {
 
@@ -43,6 +49,8 @@ function App() {
   const [filtersHeight, setFiltersHeight] = useState(null)
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  // const [fakePaginationPage, setfakePaginationPage] = useState(1)
+  // const [isLoadingMore, setIsLoadingMore] = useState(false)
 
 
   const hideFiltersCondition = useMemo(
@@ -129,6 +137,33 @@ function App() {
     },
     [routes, windowWidth]
   )
+
+  // const handleLoadMore = useCallback(
+  //   () => {
+  //     console.log('click')
+  //     setIsLoadingMore(true)
+
+  //     const routesCopy = routes && [...routes]
+
+  //     console.log(`routesCopy`, routesCopy)
+
+  //     setFilteredRoutes(prev => {
+
+  //       const upArr = [...prev, ...routesCopy?.splice(fakePaginationPage*5, 5)]
+
+  //       console.log(`upArr`, upArr)
+
+  //       return upArr
+  //     })
+
+  //     setfakePaginationPage(prev => prev+1)
+
+
+  //     setIsLoadingMore(false)
+  //   },
+  //   [fakePaginationPage, routes]
+  // )
+
 
   useEffect(() => {
       setRefreshMap(true)
@@ -227,6 +262,8 @@ function App() {
                 setSelectedRouteListItem={setSelectedRouteListItem}
                 hideFiltersCondition={hideFiltersCondition}
                 windowWidth={windowWidth}
+                // handleLoadMore={handleLoadMore}
+                // isLoadingMore={isLoadingMore}
               />
             }
             { 

@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 // import 'mapbox-gl/dist/mapbox-gl.css';
 import './index.css';
-import { ThemeProvider } from 'react-bootstrap';
+// import { ThemeProvider } from 'react-bootstrap';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Loader from './components/Loader/Loader';
@@ -15,9 +15,9 @@ import './i18n'
 ReactDOM.render(
   <React.StrictMode>
     <Suspense fallback={<Loader fullViewport />}>
-      <ThemeProvider dir="rtl" lang="he" >
+      {/* <ThemeProvider dir="rtl" lang="he" > */}
         <App />
-      </ThemeProvider>
+      {/* </ThemeProvider> */}
     </Suspense>
   </React.StrictMode>,
   document.getElementById('root')

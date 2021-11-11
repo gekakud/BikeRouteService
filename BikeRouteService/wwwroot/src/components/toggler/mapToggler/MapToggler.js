@@ -12,10 +12,10 @@ const MapToggler = ({setIsMapOpen, isMapOpen, mobile}) => {
   )
 
   return (
-    <Button className={`${styles.toggler} ${mobile ? styles.mobile : null}`} onClick={handleToggle}>
+    <div className={`${styles.toggler} ${mobile ? styles.mobile : null}`} onClick={handleToggle}>
       { !isMapOpen && <FontAwesomeIcon icon={ mobile ? `map` : `arrow-left`}  /> }
       { isMapOpen && <FontAwesomeIcon icon={ mobile ? `list` : `arrow-right` }  /> }
-    </Button>
+    </div>
   )
 }
 

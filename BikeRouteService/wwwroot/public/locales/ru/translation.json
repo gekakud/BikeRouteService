@@ -27,5 +27,6 @@
   "distance": "км",
   "uploadFormTitle": "Хотите добавить велопуть?",
   "uploadBtn": "Загрузить",
-  "file": "Файл"
+  "file": "Файл",
+  "description": "Описание"
 }

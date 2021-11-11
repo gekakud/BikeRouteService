@@ -12,10 +12,10 @@ const FiltersToggler = ({setIsFiltersOpen, isFiltersOpen, isMapOpen, mobile}) =>
   )
 
   return (
-    <Button className={`${styles.toggler} ${mobile ? styles.mobile : null} ${isMapOpen ? 'd-none' : null} `} onClick={handleToggle}>
+    <div className={`${styles.toggler} ${mobile ? styles.mobile : null} ${isMapOpen ? 'd-none' : null} `} onClick={handleToggle}>
       { isFiltersOpen && <FontAwesomeIcon icon={ mobile ? `list` : `arrow-left`}  /> }
       { !isFiltersOpen && <FontAwesomeIcon icon={ mobile ? `filter` : `arrow-right` }  /> }
-    </Button>
+    </div>
   )
 }
 

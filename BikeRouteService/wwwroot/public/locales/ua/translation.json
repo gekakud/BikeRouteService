@@ -1,11 +1,11 @@
 {
-    "routeName": "Назва велопуті",
+    "routeName": "Назва велошляху",
     "search": "Шукати",
-    "addRoute": "Додати велопуть",
+    "addRoute": "Додати велошлях",
     "filters": {
       "showAllBtn": "Показати всі",
       "clearMapBtn": "Очистити мапу",
-      "diffSelectLabel": "Складність велопуті",
+      "diffSelectLabel": "Складність велошляху",
       "diffSelect": {
         "key_0": "Усі",
         "key_1": "Початківець",
@@ -13,7 +13,7 @@
         "key_3": "Професіонал",
         "key_4": "Звір"
       },
-      "typeSelectLabel": "Тип велопуті",
+      "typeSelectLabel": "Тип велошляху",
       "typeSelect": {
         "key_0": "Усі",
         "key_1": "Мтб",
@@ -25,7 +25,8 @@
     },
     "elevation": "метрів",
     "distance": "км",
-    "uploadFormTitle": "Бажаєте додати велопуть?",
+    "uploadFormTitle": "Бажаєте додати велошлях?",
     "uploadBtn": "Завантажити",
-    "file": "Файл"
+    "file": "Файл",
+    "description": "Опис"
   }

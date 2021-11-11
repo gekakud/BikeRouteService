@@ -27,5 +27,6 @@
   "distance": "km" ,
   "uploadFormTitle": "Want to add a bike route?",
   "uploadBtn": "Upload",
-  "file": "File"
+  "file": "File",
+  "description": "Description"
 }

@@ -12,9 +12,16 @@
   width: 45px;
   height: 45px;
   z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   svg path {
     fill: #2F3B59;
+  }
+
+  &:active {
+    background-color: #eee;
   }
 
   &:hover {

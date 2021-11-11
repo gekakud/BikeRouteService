@@ -4,6 +4,7 @@ import './index.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Col, Collapse, Row, Button } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next';
+import { routesApi } from '../../../api/api';
 
 // const routeDiff = [
 //   'Begginer',
@@ -56,8 +57,8 @@ const ListItem = ({route, isFirst, setSelectedRouteListItem, onClick}) => {
       <Col xs={12}>
         <div
           className="list-item" 
-          onMouseOver={handleMouseOver}
-          onMouseOut={handleMouseOut}
+          onMouseEnter={handleMouseOver}
+          onMouseLeave={handleMouseOut}
         >
 
           <div>
@@ -92,6 +93,9 @@ const ListItem = ({route, isFirst, setSelectedRouteListItem, onClick}) => {
               <FontAwesomeIcon icon='arrow-up' className={`me-1 blue-light`}/> &nbsp;
                 {Math.round(route.properties.ElevationGain)} { t('elevation') }
             </span>
+            <a download href={`${routesApi}DownloadRouteFile?routeName=${route.properties.RouteName}`} >
+              <FontAwesomeIcon className={`blue-light download`} icon="file-download" />
+            </a>
           </div>
 
           <Collapse in={open}>

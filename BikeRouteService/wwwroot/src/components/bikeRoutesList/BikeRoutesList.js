@@ -1,8 +1,23 @@
 import './index.scss'
-import { Container } from "react-bootstrap"
+import { 
+  Container, 
+  // Row, 
+  // Button, 
+  // Col 
+} from "react-bootstrap"
 import ListItem from "./listItem/ListItem"
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-const BikeRoutesList = ({ routes, freeListViewportHeight,setSelectedRouteListItem, onFilter, hideFiltersCondition, windowWidth }) => {
+const BikeRoutesList = ({ 
+  routes, 
+  freeListViewportHeight, 
+  setSelectedRouteListItem, 
+  onFilter, 
+  hideFiltersCondition, 
+  windowWidth, 
+  // handleLoadMore, 
+  // isLoadingMore 
+}) => {
 
   return (
     <Container
@@ -23,6 +38,16 @@ const BikeRoutesList = ({ routes, freeListViewportHeight,setSelectedRouteListIte
           />
         })
       }
+
+      {/* <Row className={`py-5 mt-2 justify-content-center`}>
+        <Col xs="auto">
+          <Button onClick={handleLoadMore} className={`load-more`} size="lg">
+            Load more &nbsp;
+            { isLoadingMore && <FontAwesomeIcon icon="circle-notch" /> }
+          </Button>
+        </Col>
+      </Row> */}
+
     </Container>
   )
 }
