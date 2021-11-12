@@ -41,16 +41,8 @@ const UploadBikeRoute = ({show, uploadModalToggler}) => {
       }
 
       instance
-        // .post(`UploadFile?`, 
-        .post(`UploadFile?routeName=${values.routeName}&difficulty=${values.routeDiff}&routeType=${values.routeType}`, 
-          {
-            data,
-          },
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }
+        .post(`UploadRouteFile?routeName=${values.routeName}&difficulty=${values.routeDiff}&routeType=${values.routeType}`, 
+        data,
         )
 
         .then(response => {
@@ -99,8 +91,8 @@ const UploadBikeRoute = ({show, uploadModalToggler}) => {
           validateOnChange
           initialValues={{
             routeName: '',
-            routeDiff: 'Beginner',
-            routeType: 'Mixed',
+            routeDiff: '0',
+            routeType: '0',
             routeFile: '',
             routeDescription: ''
           }}
@@ -144,10 +136,10 @@ const UploadBikeRoute = ({show, uploadModalToggler}) => {
                         value={values.routeDiff} 
                       >
 
-                        <option value="Beginner">     { t('filters.diffSelect.key_1') } </option>
-                        <option value="Intermediate"> { t('filters.diffSelect.key_2') } </option>
-                        <option value="Proficient">   { t('filters.diffSelect.key_3') } </option>
-                        <option value="Beast">        { t('filters.diffSelect.key_4') } </option>
+                        <option value="0">     { t('filters.diffSelect.key_1') } </option>
+                        <option value="1"> { t('filters.diffSelect.key_2') } </option>
+                        <option value="2">   { t('filters.diffSelect.key_3') } </option>
+                        <option value="3">        { t('filters.diffSelect.key_4') } </option>
                       </Form.Select>
 
                       <Form.Control.Feedback type={ touched.routeDiff && errors.routeDiff ? 'invalid' : 'valid'  }>
@@ -164,10 +156,10 @@ const UploadBikeRoute = ({show, uploadModalToggler}) => {
                         onChange={handleChange}
                         value={values.routeType}
                       >
-                        <option value="Mtb">    { t('filters.typeSelect.key_1') } </option>
-                        <option value="Gravel"> { t('filters.typeSelect.key_2') } </option>
-                        <option value="Road">   { t('filters.typeSelect.key_3') } </option>
-                        <option value="Mixed">  { t('filters.typeSelect.key_4') } </option>
+                        <option value="0">    { t('filters.typeSelect.key_1') } </option>
+                        <option value="1"> { t('filters.typeSelect.key_2') } </option>
+                        <option value="2">   { t('filters.typeSelect.key_3') } </option>
+                        <option value="3">  { t('filters.typeSelect.key_4') } </option>
                       </Form.Select>
 
                       <Form.Control.Feedback type={ touched.routeType && errors.routeType ? 'invalid' : 'valid'  }>
