@@ -18,22 +18,14 @@ import axios from 'axios';
 
 const routeDifficultyColors = { 
   0 : 'green' , 
-  1 : 'blue' ,
+  1 : 'orange' ,
   2 : 'red' ,
   3 : 'black' , 
 };
-// const routeTypeColors = { 
-//   //   mtb, gravel, road, mixed
-//   0 : 'green' , 
-//   1 : 'red' ,
-//   2 : 'black' ,
-//   3 : 'orange' , 
-// };
 
 const ICON = `M192 0C85.97 0 0 85.97 0 192c0 77.41 26.97 99.03 172.3 309.7c9.531 13.77 29.91 13.77 39.44 0C357 291 384 269.4 384 192C384 85.97 298 0 192 0zM192 271.1c-44.13 0-80-35.88-80-80S147.9 111.1 192 111.1s80 35.88 80 80S236.1 271.1 192 271.1z`;
 const pinStyle = {
   cursor: 'pointer',
-  // fill: '#d00',
   stroke: 'none'
 };
 
@@ -186,7 +178,6 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
           )
 
           // console.log(`routeFittedViewport`, routeFittedViewport)
-
           setMapViewport(prevView => {
             return {
               ...prevView, 
@@ -329,7 +320,6 @@ const Map = ({routes, refreshMap, selectedLayer, setSelectedLayer, selectedRoute
           selectedRoute && <Popup
             latitude={selectedRoute.geometry.coordinates[1]}
             longitude={selectedRoute.geometry.coordinates[0]}
-            // offsetTop={-35}
             offsetLeft={0}
             {...popupPosition}
             closeButton={false}

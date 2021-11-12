@@ -6,18 +6,6 @@ import { Col, Collapse, Row, Button } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next';
 import { routesApi } from '../../../api/api';
 
-// const routeDiff = [
-//   'Begginer',
-//   'Intermediate',
-//   'Proficient',
-//   'Beast'
-// ]
-// const routeType = [
-//   'Mtb',
-//   'Gravel',
-//   'Road',
-//   'Mixed'
-// ]
 
 const ListItem = ({route, isFirst, setSelectedRouteListItem, onClick}) => {
   const [open, setOpen] = useState(false)
@@ -71,8 +59,7 @@ const ListItem = ({route, isFirst, setSelectedRouteListItem, onClick}) => {
             <h3 onClick={handleCollapse} className="mb-2">{route.properties.RouteName} </h3>
 
             <p className="list-item__short-desc pb-2 m-0">
-              Sed interdum metus at nisi tempor laoreet. Integer gravida orci a justo sodales,
-              sed lobortis est placerat.
+            {route.properties.RouteName} description
             </p>
           </div>
 
@@ -99,7 +86,7 @@ const ListItem = ({route, isFirst, setSelectedRouteListItem, onClick}) => {
           </div>
 
           <Collapse in={open}>
-            <div>Lorem ipsum dolor sit amet...</div>
+            <div>...</div>
           </Collapse>
         </div>
       </Col>

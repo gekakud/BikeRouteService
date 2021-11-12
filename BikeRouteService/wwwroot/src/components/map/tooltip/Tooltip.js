@@ -4,19 +4,6 @@ import { faArrowUp, faLongArrowAltRight, faSignal } from "@fortawesome/free-soli
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useTranslation } from "react-i18next"
 
-// const routeDiff = [
-//   'Begginer',
-//   'Intermediate',
-//   'Proficient',
-//   'Beast'
-// ]
-
-// const routeType = [
-//   'Mtb',
-//   'Gravel',
-//   'Road',
-//   'Mixed'
-// ]
 
 const Tooltip = ({ pointProps: { RouteName, RouteType, RouteLength, RouteDifficulty, ElevationGain}  }) => {
   

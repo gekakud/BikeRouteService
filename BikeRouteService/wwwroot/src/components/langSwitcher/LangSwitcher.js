@@ -26,12 +26,6 @@ const LangSwitcher = () => {
     [i18n]
   )
 
-  // useEffect(() => {
-  //   documentRootRef.current.lang = i18n.resolvedLanguage
-  //   documentRootRef.current.dir = i18n.dir(i18n.resolvedLanguage)
-  //   // console.log(`init lang`)
-  // }, [])
-
   return (
     <DropdownButton id="lang-switcher" title={i18n.resolvedLanguage} className={`lang-switcher`} >
       {

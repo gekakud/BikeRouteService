@@ -66,13 +66,6 @@ const UploadBikeRoute = ({show, uploadModalToggler}) => {
     [],
   )
 
-    // const handleFileChange = useCallback(
-    //   (e) => {
-    //     setFieldValue('routeFile', e.currentTarget.files[0])
-    //   },
-    //   [],
-    // )
-
   return (
     <Modal 
       show={show}
