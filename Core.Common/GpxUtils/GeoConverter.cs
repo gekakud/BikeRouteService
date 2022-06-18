@@ -18,8 +18,13 @@ namespace Core.Common.GpxUtils
     {
         public static void ConvertGpxToGeoJson(Stream gpxFileStream, Route routeToFill)
         {
+            if (gpxFileStream.Position > 0)
+            {
+                gpxFileStream.Position = 0;
+            }
             using (StreamReader sr = new StreamReader(gpxFileStream))
             {
+
                 GpxReader gpxReader = new GpxReader(sr.BaseStream);
                 
                 gpxReader.Read();

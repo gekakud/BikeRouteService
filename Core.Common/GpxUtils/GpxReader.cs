@@ -6,7 +6,10 @@
 // in accordance with the terms of the license agreement accompanying it.
 // ==========================================================================
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
@@ -28,6 +31,45 @@ namespace Core.Common.GpxUtils
 
         public GpxReader(Stream stream)
         {
+            XmlDocument doc = new XmlDocument();
+            doc.Load(stream);
+            string json = JsonConvert.SerializeXmlNode(doc);
+            object transactObject1 = JsonConvert.DeserializeObject(json);
+            JObject o = JObject.Parse(json);
+
+            var values = o.ToObject<Dictionary<string, object>>();
+
+            var valu = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+
+            foreach (var x in o)
+            {
+                string name = x.Key;
+                if(name == "gpx")
+                {
+                    foreach(var t in x.Value)
+                    {
+                        JProperty jp = (JProperty)t;
+                        if(jp.Name == "metadata")
+                        {
+                            foreach(var y in jp.Value)
+                            {
+                                var tt = 6;
+                            }
+                        }
+                    }
+                }
+                JToken value = x.Value;
+            }
+            //var list = JsonConvert.DeserializeObject<List<object>>(json);
+
+            //foreach (var item in list)
+            //{
+            //    foreach (KeyValuePair<string, object> keyVal in item)
+            //    {
+            //        Console.WriteLine($"{keyVal.Key}: {keyVal.Value?.ToString()}");
+            //    }
+            //}
+
             Reader_ = XmlReader.Create(stream);
 
             while (Reader_.Read())
