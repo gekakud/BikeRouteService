@@ -269,7 +269,7 @@ namespace BikeRouteService.Controllers
                     catch (Exception e)
                     {
                         Logger.LogError(e.Message);
-                        throw new Exception("Cannot correctly read GPX file. Please check file is in correct format.");
+                        throw new Exception("Cannot correctly read GPX file. Please check file is in correct format."+ e.Message);
                     }
                     break;
 

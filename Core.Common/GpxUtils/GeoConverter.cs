@@ -18,16 +18,18 @@ namespace Core.Common.GpxUtils
     {
         public static void ConvertGpxToGeoJson(Stream gpxFileStream, Route routeToFill)
         {
+            if (gpxFileStream.Position > 0)
+            {
+                gpxFileStream.Position = 0;
+            }
             using (StreamReader sr = new StreamReader(gpxFileStream))
             {
+
                 GpxReader gpxReader = new GpxReader(sr.BaseStream);
                 
-                gpxReader.Read();
                 var track = gpxReader.Track;
                 var trackPoints = gpxReader.Track.ToGpxPoints();
                 
-                //var route = gpxReader.ObjectType;
-                // var routePoints = route.ToGpxPoints();
 
                 List<Position> positions = trackPoints.Select(gpxPoint =>
                     new Position(gpxPoint.Latitude, gpxPoint.Longitude, gpxPoint.Elevation)).ToList();

@@ -2,13 +2,24 @@
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Core.Common.SharedDataObjects;
+using System.Globalization;
 
 namespace Core.Common.Extensions
 {
     public static class Extensions
     {
+        public static double ToDouble(this string value)
+        {
+            try
+            {
+                return double.Parse(value, CultureInfo.InvariantCulture.NumberFormat);
+            }
+            catch (System.Exception)
+            {
+                return 0;
+            }
+        }
         public static string Underscore(this string value)
             => string.Concat(value.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString()));
 
