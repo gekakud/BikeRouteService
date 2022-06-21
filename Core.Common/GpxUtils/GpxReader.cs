@@ -36,20 +36,30 @@ namespace Core.Common.GpxUtils
             string maxLon = (string)o["gpx"]["metadata"]["bounds"]["@maxlon"];
             string maxLat = (string)o["gpx"]["metadata"]["bounds"]["@maxlat"];
 
-            // TODO: handle multiple segments!
             Track = new GpxPointCollection();
-            JToken track_points = o["gpx"]["trk"]["trkseg"]["trkpt"];
-            foreach (JToken track_point in track_points)
-            {
-                GpxPoint p = new GpxPoint();
-                p.Latitude = ((string)track_point["@lat"]).ToDouble();
-                p.Longitude = ((string)track_point["@lon"]).ToDouble();
-                p.Elevation = ((string)track_point["ele"]).ToDouble();
-                p.Time = DateTime.Parse((string)track_point["time"], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
 
-                Track.Add(p);
+            try
+            {
+                JToken track_segments = o["gpx"]["trk"]["trkseg"];
+                foreach (JToken segment in track_segments)
+                {
+                    JToken track_points = segment["trkpt"];
+                    foreach (JToken track_point in track_points)
+                    {
+                        GpxPoint p = new GpxPoint();
+                        p.Latitude = ((string)track_point["@lat"]).ToDouble();
+                        p.Longitude = ((string)track_point["@lon"]).ToDouble();
+                        p.Elevation = ((string)track_point["ele"]).ToDouble();
+                        p.Time = DateTime.Parse((string)track_point["time"], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+
+                        Track.Add(p);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to parse JObject." + ex.Message);
             }
         }
-
     }
 }

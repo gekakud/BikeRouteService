@@ -30,7 +30,6 @@ namespace Core.Common.GpxUtils
                 var track = gpxReader.Track;
                 var trackPoints = gpxReader.Track.ToGpxPoints();
                 
-
                 List<Position> positions = trackPoints.Select(gpxPoint =>
                     new Position(gpxPoint.Latitude, gpxPoint.Longitude, gpxPoint.Elevation)).ToList();
 
