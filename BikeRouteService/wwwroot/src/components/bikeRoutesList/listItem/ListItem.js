@@ -80,7 +80,7 @@ const ListItem = ({route, isFirst, setSelectedRouteListItem, onClick}) => {
               <FontAwesomeIcon icon='arrow-up' className={`me-1 blue-light`}/> &nbsp;
                 {Math.round(route.properties.ElevationGain)} { t('elevation') }
             </span>
-            <a download href={`${routesApi}DownloadRouteFile?routeName=${route.properties.RouteName}`} >
+            <a download href={`${routesApi}DownloadRouteOriginalFile?routeName=${route.properties.RouteName}`} >
               <FontAwesomeIcon className={`blue-light download`} icon="file-download" />
             </a>
           </div>
